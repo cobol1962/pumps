@@ -19,7 +19,10 @@ $columns = array(
   array(
     'db' => 'name',
     'dt' => 'name'),
-
+	array(
+		'db' => 'sales',
+		'dt' => "sales"
+	)
 );
 
 // SQL server connection information

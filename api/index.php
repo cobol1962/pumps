@@ -839,4 +839,100 @@
     }
     return $res;
   }
+  function getProductsSales($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $res = [];
+    $sql = "select * from `products_sales` where siteid='" . $post["siteid"] . "' and `date`='$date'";
+    $res["sql"] = $sql;
+    $result = $mysqli->query($sql);
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+      $res["records"] = [];
+      while ($row = mysqli_fetch_assoc($result)) {
+        $res["records"][$row["productid"]] = $row;
+      }
+    }
+    return $res;
+  }
+  function insertUpdateProductSales($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $res = [];
+    $res["error"] = [];
+    $res["sql"] = [];
+    $sql = "insert into `products_sales` (`date`,`siteid`,`productid`,`sales`) values ('$date', '$siteid','$id','$sales')
+      ON DUPLICATE KEY UPDATE  `sales`='$sales'";
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
+  function getSiteFuels($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "SELECT distinct fuelid, `nozzles`.*, `fuel`.`grade` FROM `nozzles`
+      left join `fuel` on `nozzles`.`fuelid`=`fuel`.`id`
+      WHERE `siteid`=$siteid";
+    $result = $mysqli->query($sql);
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+      $res["records"] = [];
+      while ($row = mysqli_fetch_assoc($result)) {
+        $res["records"][$row["fuelid"]] = $row;
+      }
+    }
+    return $res;
+  }
+  function getFuelDelivery($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $res = [];
+    $sql = "select `fuel_delivery`.*, `fuel`.`grade` from `fuel_delivery`
+            left join `fuel` on `fuel_delivery`.`fuelid`=`fuel`.`id`
+            where siteid='" . $post["siteid"] . "' and `date`='$date' order by `grade`";
+    $res["sql"] = $sql;
+    $result = $mysqli->query($sql);
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+      $res["records"] = [];
+      while ($row = mysqli_fetch_assoc($result)) {
+        $res["records"][$row["fuelid"]] = $row;
+      }
+    }
+    return $res;
+  }
+  function insertUpdateFuelDelivery($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $res = [];
+    $res["error"] = [];
+    $res["sql"] = [];
+    $sql = "insert into `fuel_delivery` (`date`,`siteid`,`fuelid`,`volume`) values ('$date', '$siteid','$fuelid','$volume')
+      ON DUPLICATE KEY UPDATE  `volume`='$volume'";
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
 ?>

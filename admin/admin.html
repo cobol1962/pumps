@@ -21,6 +21,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/datatables.min.css"/>
     <style>
+    #productsTable_filter {
+      display: none;
+    }
       .jstree-wholerow-ul {
         font-size: 18px;
       }
@@ -550,6 +553,23 @@
     var oilValidator = null;
     var selectedCategory = null;
     var productsTable = null;
+    var buttonCommon = {
+    exportOptions: {
+        format: {
+            body: function ( data, row, column, node ) {
+                //check if type is input using jquery
+              
+                if (node.firstChild.tagName === "INPUT") {
+                  return  node.firstElementChild.value;
+                }
+                if (node.firstChild.tagName === "BUTTON") {
+                  return  "";
+                }
+
+            }
+        }
+    }
+  };
     url =  "http://samygroups.co.uk/admin/";
     $(document).ready(function() {
       api.call("getOils", function(res) {
@@ -792,38 +812,50 @@
           productsTable = $('#productsTable').DataTable( {
             dom: 'Bfrtip',
             buttons: [
-              'excel', 'pdf', 'print',
-              {
-                   text: 'Add product',
-                   action: function ( e, dt, node, config ) {
-                     swal({
-                       type: "info",
-                       title: "Product name",
-                       showCancelButton: true,
-                       html: "<input id='pname' class='form-control' />"
-                     }).then((result) => {
-                       if (result.value) {
-                         if ($("#pname").val() == "") {
-                           swal({
-                             type: "error",
-                             text: "Enter product name"
-                           }).then((result) => {
-                             return false;
-                           })
-                           return;
-                         }
-                         var obj = {
-                           category: selectCategory,
-                           name: $("#pname").val()
-                         }
-                         api.call("insertProduct", function(res) {
-                           productsTable.ajax.reload( null, false );
-                         }, obj, {});
-                       }
-                     });
-                   }
-               },
-            ],
+               $.extend( true, {}, buttonCommon, {
+                   extend: 'copyHtml5'
+               } ),
+               $.extend( true, {}, buttonCommon, {
+                   extend: 'excelHtml5'
+               } ),
+               $.extend( true, {}, buttonCommon, {
+                   extend: 'pdfHtml5',
+
+               } ),
+               $.extend( true, {}, buttonCommon, {
+                   extend: 'csvHtml5'
+               } ),
+               {
+                    text: 'Add product',
+                    action: function ( e, dt, node, config ) {
+                      swal({
+                        type: "info",
+                        title: "Product name",
+                        showCancelButton: true,
+                        html: "<input id='pname' class='form-control' />"
+                      }).then((result) => {
+                        if (result.value) {
+                          if ($("#pname").val() == "") {
+                            swal({
+                              type: "error",
+                              text: "Enter product name"
+                            }).then((result) => {
+                              return false;
+                            })
+                            return;
+                          }
+                          var obj = {
+                            category: selectCategory,
+                            name: $("#pname").val()
+                          }
+                          api.call("insertProduct", function(res) {
+                            productsTable.ajax.reload( null, false );
+                          }, obj, {});
+                        }
+                      });
+                    }
+                },
+           ],
             "processing": true,
             "serverSide": true,
             "ajax": url + "products.php",
@@ -1771,7 +1803,7 @@
     function deleteProduct(tr) {
 
       var $tr = $(tr);
-    
+
       var obj = {
         id: productsTable.row( $tr ).data().id
       }
