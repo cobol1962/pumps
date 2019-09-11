@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Dashboard">
+    <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
+
+    <title>Admin | Manage Users</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <link href="/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/css/jquery-ui.css" rel="stylesheet">
+    <link href="/assets/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="/assets/css/style.css" rel="stylesheet">
+    <link href="/assets/css/style-responsive.css" rel="stylesheet">
+    <link href="/assets/css/sweetalert.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/datatables.min.css"/>
+    <style>
+      .jstree-wholerow-ul {
+        font-size: 18px;
+      }
+      div.pump {
+        width: 250px;
+        max-width: 250px;
+        min-width: 250px;
+        height: 220px;
+        max-height: 220px;
+        min-height: 220px;
+        border: 1px solid;
+        padding: 0;
+        float:left;
+        box-shadow: 3px 5px #888888;
+        border-radius: 10px;
+        margin-bottom : 10px;
+        background: white;
+        margin-left: 5px;
+        position: relative;
+      }
+      div.service {
+        width: 400px;
+        max-width: 400px;
+        min-width: 400px;
+        border: 1px solid;
+        padding: 0;
+        float:left;
+        box-shadow: 3px 5px #888888;
+        border-radius: 10px;
+        margin-bottom : 10px;
+        background: white;
+        margin-left: 5px;
+        position: relative;
+        padding-bottom: 5px;
+      }
+      div.pump span,div.service span {
+        color: white;
+        position: absolute;
+        top: 2px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 18px;
+      }
+      div.pump h4, div.service h4  {
+        margin-block-start: 0em;
+        background: black;
+        color: white;
+        padding-top: 5px;
+        padding: 7px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding-bottom: 5px;
+        font-weight: bold;
+        text-align: center;
+      }
+      div.pump select.form-control {
+        margin-bottom: 5px;
+
+      }
+    </style>
+  </head>
+
+  <body  onunload="delete localStorage.referer">
+
+  <section id="container" >
+      <header class="header black-bg">
+              <div class="sidebar-toggle-box">
+                  <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
+              </div>
+            <a href="#" class="logo"><b>Admin Dashboard</b></a>
+            <div class="nav notify-row" id="top_menu">
+            </div>
+            <div class="top-menu">
+            	<ul class="nav pull-right top-menu">
+                    <li><a class="logout" onclick="delete localStorage.user;window.location.href = 'index.html';">Logout</a></li>
+            	</ul>
+            </div>
+        </header>
+      <aside>
+          <div id="sidebar"  class="nav-collapse ">
+              <ul class="sidebar-menu" id="nav-accordion">
+            	   <h5 class="centered"></h5>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('users');" class="active">
+                          <i class="fa fa-users"></i>
+                          <span>Manage Users</span>
+                      </a>
+                    </li>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('fuel');" >
+                          <i class="fa fa-users"></i>
+                          <span>Fuel Grades</span>
+                      </a>
+                    </li>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('pricelist');" >
+                          <i class="fa fa-users"></i>
+                          <span>Price List</span>
+                      </a>
+                    </li>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('pumps');" >
+                          <i class="fa fa-users"></i>
+                          <span>Configure Site</span>
+                      </a>
+                    </li>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('oillottery');" >
+                          <i class="fa fa-users"></i>
+                          <span>Oil & lottery</span>
+                      </a>
+                    </li>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('services');" >
+                          <i class="fa fa-users"></i>
+                          <span>Services</span>
+                      </a>
+                    </li>
+                    <li class="sub-menu">
+                      <a href="javascript:switchTo('products');" >
+                          <i class="fa fa-users"></i>
+                          <span>Products</span>
+                      </a>
+                    </li>
+                </ul>
+          </div>
+      </aside>
+      <section id="main-content">
+          <section page class="wrapper" id="users">
+          	<h3><i class="fa fa-angle-right"></i> Manage Users</h3>
+			        <div class="row">
+                  <div class="col-md-12">
+                      <div class="content-panel" style="padding:10px;">
+                          <table class="table table-striped table-advance table-hover" id="usersTable">
+	                  	  	  <h4><i class="fa fa-angle-right"></i> All User Details </h4>
+	                  	  	  <hr>
+                              <thead>
+                              <tr>
+                                  <th>Sno.</th>
+                                  <th class="hidden-phone">Site</th>
+                                  <th>Address</th>
+                                  <th>Email</th>
+                                  <th>Contact no.</th>
+                                  <th>Reg. Date</th>
+                                  <th>Active</th>
+                                  <th>Action</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </section>
+         <section page class="wrapper" id="fuel" style="display:none;padding: 20px;">
+
+             <table class="table table-striped table-advance table-hover" id="fuelGrades" style="width:500px;margin:0px auto;">
+               <h4><i class="fa fa-angle-right"></i> Fuel Grades - generally for whole App. Of course every pump on every site can be configured using this fuel grades.<br />
+                 Initial price is in fact only for new created site - for first date - to make start easier. If site has already proces, we will use last day price as start.
+                </h4>
+               <hr>
+                 <thead>
+                 <tr>
+                     <th style='display:none;'></th>
+                     <th>Grade</th>
+                     <th>Initial price</th>
+                     <th>Action</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+
+                 </tbody>
+             </table>
+
+         </section>
+         <section page class="wrapper" id="pricelist" style="display:none;padding: 20px;">
+           <div style="margin:20px auto;width:220px;">
+             <label for="priceDate">Select date</label>
+             <input type="text" class="form-control" id="priceDate" style="width:200px;"/>
+
+           </div>
+            <div style="margin:20px auto;width:350px;min-width:350px;">
+              <select id="selectSites" multiple="multiple" style="margin-top:10px;min-width:300px;">
+              </select>
+            <button class="btn-save btn btn-primary btn-sm" onclick="filterPriceList();">Show selected only</button>
+            </div>
+            <div style="margin:20px auto;width:100%;">
+               <table id="priceTable" class="table table-striped table-advance table-hover" style="margin:20px auto;">
+                 <thead>
+                   <tr>
+                   </tr>
+                 </thead>
+                 <tbody>
+                 </tbody>
+               </table>
+           </div>
+         </section>
+
+         <section page class="wrapper" id="pumps" style="display:none;padding: 20px;">
+
+           <div style="margin:20px auto;width:220px;">
+             <label for="sites">Select site</label>
+             <select id="sites" onchange="siteChanged(this);" class="form-control">
+               <option value="-1">Select site</option>
+             </select>
+           </div>
+           <div style="width:100%;text-align:center;border-top:1px solid black;border-bottom:1px solid black;padding-top:5px;padding-bottom: 5px;">
+              <button onclick="addPump();" id="addPump" class="btn btn-primary">Add Pump</button>
+          </div>
+           <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="sitesList">
+
+           </div>
+           <div style="width:100%;text-align:center;border-top:1px solid black;border-bottom:1px solid black;padding-top:5px;padding-bottom: 5px;">
+              <button onclick="saveSiteConfiguration();" id="addPump" class="btn btn-primary">Save configuration</button>
+          </div>
+         </section>
+
+         <section page class="wrapper" id="oillottery" style="display:none;min-width:100%;">
+          <h3><i class="fa fa-angle-right"></i>Oil & lottery list</h3>
+            <div class="row">
+                 <div class="col-md-12">
+                     <div class="content-panel" style="padding:10px;">
+                       <table class="table table-striped table-advance table-hover" style="min-width:100%;" id="oilTable">
+                         <h4><i class="fa fa-angle-right"></i> All User Details </h4>
+                         <hr>
+                           <thead>
+                           <tr>
+                             <th>Sno.</th>
+                             <th>Name</th>
+                             <th>Type</th>
+                             <th>Price</th>
+                             <th>Discount</th>
+                             <th>Active</th>
+                             <th>Posted</th>
+                             <th>Action</th>
+                           </tr>
+                           </thead>
+                           <tbody>
+
+                           </tbody>
+                       </table>
+
+                     </div>
+                 </div>
+             </div>
+         </section>
+         <section page class="wrapper" id="services" style="display:none;padding: 20px;">
+
+           <div style="margin:20px auto;width:220px;">
+             <label for="serviceSites">Select site</label>
+             <select id="serviceSites" onchange="serviceSiteChanged(this);" class="form-control">
+               <option value="-1">Select site</option>
+             </select>
+           </div>
+           <div style="width:100%;text-align:center;border-top:1px solid black;border-bottom:1px solid black;padding-top:5px;padding-bottom: 5px;">
+              <button onclick="addService();" id="addService" class="btn btn-primary">Add Service</button>
+          </div>
+           <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="servicesList">
+
+           </div>
+
+         </section>
+         <section page  class="wrapper" id="products" style="display:none;padding: 20px;">
+           <div class="row">
+             <div  class="col-lg-4">
+               <div id="products_jstree">
+
+                </div>
+             </div>
+             <div class="col-lg-8">
+               <table class="table table-striped table-advance table-hover" style="min-width:100%;" id="productsTable">
+                 <h4><i class="fa fa-angle-right"></i> Products belongs to selected category </h4>
+                 <hr>
+                   <thead>
+                     <tr>
+                       <th></th>
+                       <th></th>
+                       <th>Name</th>
+                       <th>Action</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+
+                   </tbody>
+               </table>
+             </div>
+           </div>
+         </section>
+    </section>
+    <div class="modal" tabindex="-1" role="dialog" id="modalForm">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">User data</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="userForm">
+                <input type="hidden" id="id" name="id"/>
+                <input type="hidden" id="posting_date" name="posting_date" />
+                <div class="form-group">
+                  <label for="fname">Site Name</label>
+                  <input type="text" class="form-control" id="site" name="site" placeholder="Enter Site Name">
+                </div>
+                <div class="form-group">
+                  <label for="lname">Address</label>
+                  <input type="text" class="form-control" id="address" name="address" placeholder="Enter Address">
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="Enter E-mail">
+                </div>
+                <div class="form-group" id="temppass" style="display:none;">
+                  <label for="password">Temp password</label>
+                  <input type="text" class="form-control" id="password" name="password" placeholder="Enter Temp Password">
+                </div>
+                <div class="form-group">
+                  <label for="contactno">Contact tel.</label>
+                  <input type="number" class="form-control" id="contactno" name="contactno" placeholder="Enter Contact Phone">
+                </div>
+                <div class="form-group">
+                  <label for="active">Active</label>
+                  <select  class="form-control" id="active" name="active">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" onclick="$('#userForm').submit();" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="modalOilForm">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Oil & Lottery</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="oilForm">
+                <input type="hidden" id="oilid" name="oilid"/>
+                <input type="hidden" id="date_added" name="date_added" />
+                <div class="form-group">
+                  <label for="fname">Name</label>
+                  <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name">
+                </div>
+                <div class="form-group">
+                  <label for="type">Oil or lottery</label>
+                  <select  class="form-control" id="type" name="type">
+                    <option value="1">Oil</option>
+                    <option value="2">Lottery</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" id="price" name="price" placeholder="Enter Price">
+                      </div>
+                  </div>
+                  <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="">Discount</label>
+                        <input type="number" class="form-control" id="discount" name="discount" placeholder="Discount">
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                  <label for="active">Active</label>
+                  <select  class="form-control" id="active" name="active">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" onclick="$('#oilForm').submit();" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="specialOilForm">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Oil & Lottery - settings for sites</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="oilForm">
+                <div class="form-group">
+                  <label for="selectOilSites">Settings will aplly on selceted site(s)</label><br />
+                  <select id="selectOilSites" multiple="multiple" style="margin-top:10px;min-width:300px;">
+                  </select>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" id="price" name="price" placeholder="Enter Price">
+                      </div>
+                  </div>
+                  <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="">Discount</label>
+                        <input type="number" class="form-control" id="discount" name="discount" placeholder="Discount">
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                  <label for="type">Is Special Offer</label>
+                  <select  class="form-control" id="special_offer" name="special_offer">
+                    <option value="1">Yes</option>
+                    <option value="2">No</option>
+                  </select>
+                </div>
+
+               <div class="form-group">
+                  <label for="">Text appear on site url for this offer</label>
+                  <input type="text" class="form-control" id="special_offer_text" name="special_offer_text" placeholder="Special offer text">
+                </div>
+
+                <div class="form-group">
+                  <label for="active">Active</label>
+                  <select  class="form-control" id="active" name="active">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" onclick="submitSpecialOil();" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+</div></div>
+          <div class="modal" tabindex="-1" role="dialog" id="oilActions">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Oil & Lottery - sales actions</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="oilForm">
+                      <div class="form-group">
+                        <label for="selectOils">Select oil/lottery(s)</label><br />
+                        <select id="selectOils" multiple="multiple" style="margin-top:10px;min-width:300px;">
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="selectOilSites1">Settings will aplly on selceted site(s)</label><br />
+                        <select id="selectOilSites1" multiple="multiple" style="margin-top:10px;min-width:300px;">
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="">Discount</label>
+                        <input type="number" class="form-control" id="discount" name="discount" placeholder="Discount">
+                      </div>
+
+
+                     <div class="form-group">
+                        <label for="">Text appear on site url for this action</label>
+                        <input type="text" class="form-control" id="special_offer_text" name="special_offer_text" placeholder="Special action text">
+                      </div>
+
+                    </form>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" onclick="submitDeleteAction();" class="btn btn-danger">Delete special offers</button>
+                    <button type="button" onclick="submitAction();" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+        </div>
+    </div>
+    <script src="/assets/js/jquery.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <script class="include" type="text/javascript" src="/assets/js/jquery.dcjqaccordion.2.7.js"></script>
+    <script src="/assets/js/jquery.scrollTo.min.js"></script>
+    <script src="/assets/js/jquery.nicescroll.js" type="text/javascript"></script>
+    <script src="/assets/js/common-scripts.js"></script>
+    <script type="text/javascript" src="/assets/js/api.js"></script>
+    <script type="text/javascript" src="/assets/js/sweetalert2.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.validate.js"></script>
+    <script type="text/javascript" src="/assets/js/underscore.js"></script>
+<link rel="stylesheet" href="/assets/css/bootstrap-select.css" type="text/css"/>
+    <script type="text/javascript" src="/assets/js/bootstrap-select.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+   <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/datatables.min.js"></script>
+   <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.colVis.min.js"></script>
+  <script type="text/javascript">
+    var fuelList = null;
+    var uTable = null;
+    var validator = null;
+    var user = null;
+    var pdate = "";
+    var pTable = null;
+    var siteList = null;
+    var oilValidator = null;
+    var selectedCategory = null;
+    var productsTable = null;
+    url =  "http://samygroups.co.uk/admin/";
+    $(document).ready(function() {
+      api.call("getOils", function(res) {
+        $.each(res.records, function() {
+          $("<option value='" + this.oilid + "'>" + this.name + "</option>").appendTo($("#selectOils"));
+        });
+        $('#selectOils').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true
+        });
+      }, {}, {});
+      var ww = setInterval( function()  {
+        if (siteList != null) {
+          clearInterval(ww);
+
+          var slist = _.sortBy(siteList,"site");
+          $.each(slist, function() {
+            $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectSites"));
+            $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectOilSites"));
+            $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectOilSites1"));
+
+          });
+          $('#selectSites').multiselect({
+              includeSelectAllOption: true,
+              enableFiltering: true
+          });
+          $('#selectOilSites, #selectOilSites1').multiselect({
+              includeSelectAllOption: true,
+              enableFiltering: true
+          });
+
+         }
+        }, 100);
+      $('#priceDate').datepicker({
+        maxDate: "+30D",
+        onSelect: function(dateText) {
+          var dt = $('#priceDate').datepicker('getDate');
+          pdate = dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0");
+          initPrices();
+        }
+      });
+      $('#priceDate').datepicker('setDate', 'today');
+      var dt = $('#priceDate').datepicker('getDate');
+      pdate = dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0");
+      initPrices();
+      if (localStorage.user === undefined) {
+        window.location.href = "index.html";
+      }
+      user = $.parseJSON(localStorage.user);
+
+      if ( user.user_type != "1") {
+        window.location.href = "index.html";
+      }
+      swal.setDefaults({
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showCloseButton: false,
+        buttonsStyling: false,
+        confirmButtonClass: 'btn btn-primary',
+        cancelButtonClass: 'btn btn-danger'
+      });
+      initTable();
+      initFuel();
+      initOil();
+      jQuery.validator.addMethod("isEmail", function(value, element) {
+      // allow any non-whitespace characters as the host part
+        return this.optional( element ) || /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test( value );
+      }, $("#err_invalid_email").html());
+      validator = $('#userForm').validate({
+        rules: {
+            site: {
+                required: true
+            },
+            address: {
+                required: true
+            },
+            email: {
+                required: true,
+                isEmail: true
+            },
+            contactno: {
+                required: true
+            },
+            password: {
+                required: true
+            }
+        },
+        messages: {
+            site: {
+                required:  "This field is required"
+            },
+            address: {
+              required:  "This field is required"
+            },
+            email: {
+                isEmail:  "Invalid email",
+                required:  "This field is required"
+
+            },
+            contactno: {
+                required:  "This field is required"
+            },
+            password: {
+                required: "This field is required"
+            }
+        },
+        validClass: "success",
+        highlight: function(element, errorClass, validClass) {
+          $(element).removeClass("success");
+          $(element).addClass("error");
+          $("[target='" + element.id + "']").removeClass("success");
+        },
+        errorPlacement: function (error, element) {
+            $("[target='" + $(element).attr("id") + "']").removeClass("success");
+            error.appendTo(element.parent());
+            element.removeClass("success");
+            element.addClass("error");
+        },
+        invalidHandler: function(f, v) {
+
+        },
+        success: function(label) {
+            $("[target='" + $(label).attr("for") + "']").addClass("success");
+            if ($(label).html() == "") {
+              $(label).remove();
+            }
+        },
+        submitHandler: function(form) {
+          saveUser();
+        }
+      });
+
+      oilValidator = $('#oilForm').validate({
+        rules: {
+            name: {
+                required: true
+            },
+            price: {
+                required: true,
+                min: 0.01
+            }
+        },
+        messages: {
+            name: {
+                required:  "This field is required"
+            },
+            price: {
+              required:  "This field is required",
+              min: "Please enter value greater than 0"
+            }
+
+        },
+        validClass: "success",
+        highlight: function(element, errorClass, validClass) {
+          $(element).removeClass("success");
+          $(element).addClass("error");
+          $("[target='" + element.id + "']").removeClass("success");
+        },
+        errorPlacement: function (error, element) {
+            $("[target='" + $(element).attr("id") + "']").removeClass("success");
+            error.appendTo(element.parent());
+            element.removeClass("success");
+            element.addClass("error");
+        },
+        invalidHandler: function(f, v) {
+
+        },
+        success: function(label) {
+            $("[target='" + $(label).attr("for") + "']").addClass("success");
+            if ($(label).html() == "") {
+              $(label).remove();
+            }
+        },
+        submitHandler: function(form) {
+          addEditOil();
+        }
+      });
+      $('#products_jstree').jstree({
+          'core' : {
+        'data' : {
+                'url' : 'product_categories.php?operation=get_node',
+                'data' : function (node) {
+                  return { 'id' : node.id };
+                },
+                "dataType" : "json"
+              }
+              ,'check_callback' : true,
+              'themes' : {
+                'responsive' : false
+              }
+        },
+        'plugins' : ['state','contextmenu','wholerow']
+          }).on('create_node.jstree', function (e, data) {
+
+            $.get('product_categories.php?operation=create_node', { 'id' : data.node.parent, 'position' : data.position, 'text' : data.node.text })
+              .done(function (d) {
+                data.instance.set_id(data.node, d.id);
+              })
+              .fail(function () {
+                data.instance.refresh();
+              });
+          }).on('rename_node.jstree', function (e, data) {
+            $.get('product_categories.php?operation=rename_node', { 'id' : data.node.id, 'text' : data.text })
+              .fail(function () {
+                data.instance.refresh();
+              });
+          }).on('delete_node.jstree', function (e, data) {
+
+              api.call("getProductsFromCategory", function(res) {
+                if (res.count == "0") {
+                    $.get('product_categories.php?operation=delete_node', { 'id' : data.node.id })
+                      .fail(function () {
+                        data.instance.refresh();
+                    });
+                  } else {
+                    swal({
+                      type: "error",
+                      text: "Products exists in selected category!. Delete forbiden!"
+                    })
+
+                  }
+                  $('#products_jstree').jstree(true).refresh();
+              }, {category : data.node.id }, {});
+
+          }).on('select_node.jstree', function (e, data) {
+            selectCategory = data.node.id;
+
+              var ww = setInterval(function() {
+                if (productsTable !== undefined) {
+                  clearInterval(ww);
+                  productsTable
+                    .column( 1 )
+                    .search( selectCategory )
+                    .draw();
+                }
+              }, 100)
+
+          });
+
+          productsTable = $('#productsTable').DataTable( {
+            dom: 'Bfrtip',
+            buttons: [
+              'excel', 'pdf', 'print',
+              {
+                   text: 'Add product',
+                   action: function ( e, dt, node, config ) {
+                     swal({
+                       type: "info",
+                       title: "Product name",
+                       showCancelButton: true,
+                       html: "<input id='pname' class='form-control' />"
+                     }).then((result) => {
+                       if (result.value) {
+                         if ($("#pname").val() == "") {
+                           swal({
+                             type: "error",
+                             text: "Enter product name"
+                           }).then((result) => {
+                             return false;
+                           })
+                           return;
+                         }
+                         var obj = {
+                           category: selectCategory,
+                           name: $("#pname").val()
+                         }
+                         api.call("insertProduct", function(res) {
+                           productsTable.ajax.reload( null, false );
+                         }, obj, {});
+                       }
+                     });
+                   }
+               },
+            ],
+            "processing": true,
+            "serverSide": true,
+            "ajax": url + "products.php",
+            "columnDefs": [
+              {
+                'targets': 0,
+                'data': "id",
+                'visible': false
+              },
+              {
+                'targets': 1,
+                'data': "category",
+                'visible': false
+              },
+              {
+                'targets': 2,
+                'data': "name",
+                orderable: true,
+                render: function (data, type, row, meta) {
+                    var html = '<input class="form-control" type="text" onchange="changeProduct(this);" value="' + data + '" />';
+                    return html;
+                }
+              },
+              {
+                'targets': 3,
+                'data': null,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    var html = '';
+                    html += '<button onclick="deleteProduct(this.parentNode.parentNode);" style="margin-left:5px;" class="btn btn-danger"><i class="fa fa-trash-o "></i></button>';
+                    return html;
+                }
+              },
+            ]
+          } );
+       // 8 interact with the tree - either way is OK
+    /*   $('button').on('click', function () {
+         $('#jstree').jstree(true).select_node('child_node_1');
+         $('#jstree').jstree('select_node', 'child_node_1');
+         $.jstree.reference('#jstree').select_node('child_node_1');
+       });*/
+    });
+    function initTable() {
+      uTable = $('#usersTable').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+          'excel', 'pdf', 'print',
+          {
+               text: 'Add user',
+               action: function ( e, dt, node, config ) {
+                  $("#modalForm").attr("mode", "add");
+                  $("#temppass").show();
+                  $("#modalForm").modal("show");
+               }
+           },
+        ],
+        "processing": true,
+        "serverSide": true,
+        "ajax": url + "users.php",
+        "columnDefs": [
+          {
+            'targets': 0,
+            'data': "id",
+
+          },
+          {
+            'targets': 1,
+            'data': "site",
+            orderable: true
+          },
+          {
+            'targets': 2,
+            'data': "address",
+            orderable: true
+          },
+          {
+            'targets': 3,
+            'data': "email",
+            orderable: true
+          },
+          {
+            'targets': 4,
+            'data': "contactno",
+            orderable: true
+          },
+          {
+            'targets': 5,
+            'data': "posting_date",
+            orderable: true
+          },
+          {
+            'targets': 6,
+            'data': "active",
+            orderable: false,
+            render: function (data, type, row, meta) {
+                var html = (data == "1") ? "Yes" : "No";
+                return html;
+            }
+          },
+          {
+            'targets': 7,
+            'data': null,
+            orderable: false,
+            render: function (data, type, row, meta) {
+                var html = '<button onclick="editUser(this.parentNode.parentNode);" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>';
+                html += '<button onclick="deleteUser(this.parentNode.parentNode);" style="margin-left:5px;" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>';
+                return html;
+            }
+          },
+        ]
+      } );
+    }
+    function saveUser() {
+      addEditUser();
+    }
+    function addEditUser() {
+      var dt = new Date();
+      $("#posting_date").val(dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0") + " " + dt.getHours().toString().padStart(2, "0") + ":" + dt.getMinutes().toString().padStart(2, "0") + ":" + dt.getSeconds().toString().padStart(2, "0"));
+      var obj = {};
+      $.each($("#modalForm").find("[name]"), function() {
+        obj[$(this).attr("name")] = $(this).val();
+      });
+
+      if ($("#modalForm").attr("mode") == "add") {
+        delete obj.id;
+        api.call("createUser", function(res) {
+          if (res.status == "fail") {
+            swal({
+              type: "error",
+              text: res.error
+            });
+          }
+          if (res.status == "ok") {
+            uTable.ajax.reload( null, false );
+            $("#modalForm").modal("hide");
+            var o = {
+              siteid: res.siteid,
+              date: pdate
+            }
+            api.call("generateNewSitePrices", function res() {
+              swal({
+                type: "success",
+                text: "User created"
+              });
+              initPrices();
+            }, o, {});
+
+          }
+        }, obj, {})
+      }
+      if ($("#modalForm").attr("mode") == "edit") {
+        delete obj.password;
+        api.call("editUser", function(res) {
+          if (res.status == "fail") {
+            swal({
+              type: "error",
+              text: res.error
+            });
+          }
+          if (res.status == "ok") {
+            uTable.ajax.reload( null, false );
+            $("#modalForm").modal("hide");
+            swal({
+              type: "success",
+              text: "User updatet succesfully"
+            });
+          }
+        }, obj, {})
+      }
+    }
+    function editUser(row) {
+      $("#modalForm").attr("mode", "edit");
+      validator.resetForm();
+      $("#temppass").hide();
+      $("#modalForm").find("#id").val($(row).find("td").eq(0).html().trim());
+      $("#modalForm").find("#site").val($(row).find("td").eq(1).html().trim());
+      $("#modalForm").find("#address").val($(row).find("td").eq(2).html().trim());
+      $("#modalForm").find("#email").val($(row).find("td").eq(3).html().trim());
+      $("#modalForm").find("#contactno").val($(row).find("td").eq(4).html().trim());
+      $("#modalForm").find("#active").val(($(row).find("td").eq(4).html().trim() == "Yes") ? "1" : "0");
+      $("#modalForm").modal("show");
+    }
+    function deleteUser(row) {
+      swal({
+        type: "question",
+        showCancelButton: true,
+        text: "Are you sure? User " + $(row).find("td").eq(1).html() + " will not be able to login!"
+      }).then((result) => {
+        if (result.value) {
+          var obj = {
+            id: $(row).find("td").eq(0).html().trim()
+          }
+          api.call("deactivateUser", function(res) {
+            if (res.status == "fail") {
+              swal({
+                type: "error",
+                text: res.error
+              });
+            }
+            if (res.status == "ok") {
+              uTable.ajax.reload( null, false );
+
+              swal({
+                type: "success",
+                text: "User deactivated succesfully"
+              });
+            }
+          }, obj, {})
+        }
+      });
+    }
+    function switchTo(page) {
+      $("[page]").hide();
+      $("#" + page).show();
+    }
+    function initFuel() {
+      var $tb = $("#fuelGrades").find("tbody");
+      api.call("getFuel", function(res) {
+        $.each(res, function() {
+          var html = "<tr><td style='display:none;'>" + this.id + "</td><td><input type='text' style='width:300px;' value='" + this.grade + "'/><td><input type='number' style='width:100px;' value='" + this.initialprice + "'/></td><td><button onclick='editFuel(this.parentNode.parentNode);' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></button><button onclick='deleteFuel(this.parentNode.parentNode);' style='margin-left:5px;' class='btn btn-danger btn-xs'><i class='fa fa-trash-o'></i></button>";
+          $(html).appendTo($tb);
+        });
+        var html = "<tr><td style='display:none;'>-1</td><td><input type='text' style='width:300px;' /></td><td><input type='number' style='width:100px;' value='0.00'/></td><td><button onclick='editFuel(this.parentNode.parentNode);' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></button><button onclick='deleteFuel(this.parentNode.parentNode);' style='margin-left:5px;' class='btn btn-danger btn-xs'><i class='fa fa-trash-o'></i></button>";
+        $(html).appendTo($tb);
+      }, {} , {})
+    }
+    function editFuel(row) {
+      var $tb = $("#fuelGrades").find("tbody");
+      var $row = $(row);
+      if ($row.find("input").eq(0).val() == "" || $row.find("input").eq(1).val() == "") {
+        swal({
+          type: "error",
+          text: "Please enter all fields"
+        });
+        return;
+      }
+      var id = $row.find("td").eq(0).html().trim();
+      if (id == -1) {
+        var obj = {
+          grade: $(row).find("td").eq(1).find("input").val(),
+          initialprice: $(row).find("td").eq(2).find("input").val()
+        }
+        api.call("addFuel", function(res) {
+          if (res.status == "ok") {
+            $(row).find("td").eq(0).html(res.id);
+            var html = "<tr><td style='display:none;'>-1</td><td><input type='text' style='width:300px;' /></td><td><input type='number' style='width:100px;' value='0.00'/></td><td><button onclick='editFuel(this.parentNode.parentNode);' class='btn btn-primary btn-xs'><i class='fa fa-pencil'></i></button><button onclick='deleteFuel(this.parentNode.parentNode);' style='margin-left:5px;' class='btn btn-danger btn-xs'><i class='fa fa-trash-o'></i></button>";
+
+            $(html).appendTo($tb);
+            var o = {
+              siteid: "all",
+              date: pdate,
+              fuelid: res.id,
+              price: res.price
+            }
+            api.call("generateNewFuelPrices", function res() {
+              initPrices();
+            }, o, {});
+          } else {
+            swal({
+              type: "warning",
+              text: res.error
+            })
+          }
+        }, obj , {})
+      }
+      if (id != -1) {
+        var obj = {
+          id: $(row).find("td").eq(0).html().trim(),
+          grade: $(row).find("td").eq(1).find("input").val(),
+          initialprice: $(row).find("td").eq(2).find("input").val()
+        }
+        api.call("updateFuel", function(res) {
+          if (res.status == "ok") {
+          } else {
+            swal({
+              type: "warning",
+              text: res.error
+            })
+          }
+        }, obj , {})
+      }
+    }
+    function deleteFuel(row) {
+      var $row = $(row);
+      swal({
+        type: "question",
+        title: "Are you sure? " + $row.find("input").eq(0).val() + " will be deleted",
+        text: "Additional check will be added"
+      }).then((result) => {
+        var obj = {
+          id: $(row).find("td").eq(0).html().trim()
+        }
+        api.call("deleteFuel", function(res) {
+          if (res.status == "ok") {
+            $row.remove();
+            initPrices();
+          } else {
+            swal({
+              type: "warning",
+              text: res.error
+            })
+          }
+        }, obj , {})
+      })
+    }
+    function initPrices() {
+      api.call("createPricetable", createPriceTable, {date: pdate}, {});
+    }
+    var colVisible = null;
+    function createPriceTable(res) {
+
+      if (pTable != null) {
+        colVisible = [];
+        pTable.columns().every( function (ind) {
+          colVisible.push(this.visible());
+        });
+        pTable.destroy();
+        pTable = null;
+      }
+      $("#priceTable").find("thead").find("tr").html("");
+      $("#priceTable").find("tbody").html("");
+      var $thr = $("#priceTable").find("thead").find("tr");
+      var $tbd = $("#priceTable").find("tbody");
+      $("<th>Site</th>").appendTo($thr);
+      fuelList = res.fuel;
+      $.each(res.fuel, function() {
+        $("<th fuelid='" + this.id + "'>" + this.grade + "</th>").appendTo($thr);
+      })
+      siteList = res.sites;
+      var ssites = [];
+      if ($("#selectSites").val() != null) {
+        ssites = $("#selectSites").val();
+      }
+      $.each(res.sites, function() {
+        if (ssites.indexOf(this.id) > -1 || ssites.length == 0) {
+            if ($("#sites").find("[value='" + this.id + "']").length == 0) {
+              $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#sites"));
+            }
+            if ($("#serviceSites").find("[value='" + this.id + "']").length == 0) {
+              $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#serviceSites"));
+            }
+            var $tr = $("<tr siteid='" + this.id + "'><td>" + this.site + "</td></tr>").appendTo($tbd);
+            $.each(res.fuel, function() {
+              $("<td fuelid='" + this.id + "'>" + "<input type='text' />" + "</td>").appendTo($tr);
+            })
+          }
+      });
+      $.each(res.records, function() {
+        var $r = $("[siteid='" + this.siteid + "']");
+        var $c = $r.find("[fuelid='" + this.fuelid + "']");
+        $c.find("input").val(this.price);
+      });
+      $("#priceTable input").css({
+        textAlign: "right"
+      })
+      pTable = $("#priceTable").DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+           'colvis'
+       ]
+      });
+      if (colVisible != null) {
+        pTable.columns().every( function (ind) {
+          this.visible(colVisible[ind]);
+        });
+      }
+      $("#priceTable input").bind("change", function() {
+        var obj = {
+          date: pdate,
+          siteid: $(this).closest("tr").attr("siteid"),
+          fuelid: $(this).closest("td").attr("fuelid"),
+          price: $(this).val()
+        }
+        api.call("updateFuelPrice", function(res) {
+        }, obj, {});
+      })
+      if (selectAllSites) {
+        var ww1 = setInterval(function() {
+          if ($("#selectSites").find("option").length > 0) {
+            clearInterval(ww1);
+            $('#selectSites').multiselect('selectAll', false);
+            $('#selectSites').multiselect('updateButtonText')
+          }
+        }, 100);
+      }
+    }
+    function siteChanged(el) {
+      var $el = $(el);
+      var obj = {
+        siteid: $(el).val()
+      }
+      api.call("getSitePumps", drawPumps, obj, {});
+    }
+    function serviceSiteChanged(el) {
+
+      var $el = $(el);
+      var obj = {
+        siteid: $(el).val()
+      }
+      api.call("getSiteServices", drawServices, obj, {});
+    }
+    function drawPumps(res) {
+      $("#sitesList").html("");
+      $.each(res.records, function() {
+        var did = "pumpDiv_" + this.pumpid;
+        var tid = "pumpTable_" + this.pumpid;
+        var $dv = $("<div pump id='" + did + "' class='pump' siteid='" + this.siteid + "' pumpid='" + this.pumpid + "'></div>").appendTo($("#sitesList"));
+        $("<h4>" + this.label + "</h4><span onclick='deletePump(this);' style='cursor:pointer;position:absolute; right: 7px;'>X</span>").appendTo($("#" + did));
+        var $dv1 = $(document.createElement("DIV"));
+        $dv1.css({
+            padding: 10
+        });
+        for (i=0;i<4;i++) {
+          var slct = document.createElement("SELECT");
+          slct.className = "form-control";
+          $(slct).attr("pumpid", this.pumpid);
+          $(slct).attr("nozzleid", "-1");
+          $(slct).attr("siteid", this.siteid);
+          $(slct).css({
+            maxWidth: "60%",
+            width: "60%",
+            float: "left"
+          })
+          $("<option value='-1'>Empty</option>").appendTo($(slct));
+          $.each(fuelList, function() {
+            $("<option value='" + this.id + "'>" + this.grade + "</option>").appendTo($(slct));
+
+          });
+          $(slct).appendTo($dv1);
+          $("<input style='width:35%;float:left;' class='form-control' type='text' placeholder='start' value=''/>").appendTo($dv1);
+        }
+        $dv1.appendTo($dv);
+        var ths = this;
+        var o = {
+          siteid: ths.siteid,
+          pumpid: ths.pumpid
+        }
+        api.call("getNozzles", function(r) {
+          $.each(r.records, function() {
+            var $dv = $("#" + "pumpDiv_" + this.pumpid);
+            var $slct = $dv.find("[nozzleid='-1']").eq(0);
+            $slct.attr("nozzleid", this.nozzleid);
+            $slct.val(this.fuelid);
+
+            $slct.next("input").val(this.start);
+            console.log(r);
+          });
+        }, o, {});
+      });
+    }
+    function addPump() {
+      if ($("#sites").val() == "-1") {
+        swal({
+          type: "error",
+          text: "Select site please"
+        })
+      }
+      if ($("#sites").val() == "-1") {
+        return;
+      }
+      swal({
+        type: "question",
+        showCancelButton: true,
+        confirmButtonText: "Add",
+        title: "Enter pump label",
+        html: "<input type='text' id='pumpLabel' />"
+      }).then((result) => {
+        if (result.value) {
+          var dt = new Date();
+          var d = dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0");
+
+          var obj = {
+            siteid: $("#sites").val(),
+            label: $("#pumpLabel").val(),
+            date_added: d
+          }
+          api.call("insertSitePump", function(res) {
+            siteChanged(document.getElementById("sites"));
+          }, obj, {});
+        }
+      })
+    }
+    function deletePump(el) {
+      var $dv = $(el).closest("[pump]");
+
+      swal({
+        type: "question",
+        showCancelButton: true,
+        text: "Are you sure you wish to delete pump " + $dv.find("h4").text() + "?"
+      }).then((result) => {
+        if (result.value) {
+          var obj = {
+            pumpid: $dv.attr("pumpid")
+          }
+          api.call("deletePump", function(res) {
+            $dv.remove();
+          }, obj, {});
+        }
+      });
+    }
+    function deleteService(el) {
+      var $dv = $(el).closest("[service]");
+
+      swal({
+        type: "question",
+        showCancelButton: true,
+        text: "Are you sure you wish to delete service " + $dv.find("h4").text() + "?"
+      }).then((result) => {
+        if (result.value) {
+          var obj = {
+            serviceid: $dv.attr("serviceid")
+          }
+          api.call("deleteService", function(res) {
+            $dv.remove();
+          }, obj, {});
+        }
+      });
+    }
+    function saveSiteConfiguration() {
+      $.each($("[nozzleid]"), function() {
+        if ($(this).attr("nozzleid") == "-1" && $(this).val() != "-1") {
+          var ths = this;
+          var obj = {
+            pumpid: $(this).attr("pumpid"),
+            siteid: $(this).attr("siteid"),
+            fuelid: $(this).val(),
+            start: $(this).next("input").val()
+          }
+          api.call("insertNozzle", function(r) {
+            $(ths).attr("nozzleid", r.nozzleid);
+          }, obj, {});
+        }
+
+        if ($(this).attr("nozzleid") != "-1" && $(this).val() != "-1") {
+          var obj = {
+            nozzleid: $(this).attr("nozzleid"),
+            pumpid: $(this).attr("pumpid"),
+            siteid: $(this).attr("siteid"),
+            fuelid: $(this).val(),
+            start: $(this).next("input").val()
+          }
+          api.call("updateNozzle", function() {
+
+          }, obj, {});
+        }
+
+        if ($(this).attr("nozzleid") != "-1" && $(this).val() == "-1") {
+          var obj = {
+            nozzleid: $(this).attr("nozzleid")
+          }
+          api.call("deleteNozzle", function() {
+
+          }, obj, {});
+        }
+      });
+      swal({
+        type: "success",
+        text: "Configuration saved"
+      })
+    }
+    var selectAllSites = true;
+    function filterPriceList() {
+
+      if ($("#selectSites").val() == null) {
+        return;
+      }
+      var s = $("#selectSites").val().join(",");
+
+      selectAllSites = false;
+      api.call("createPricetable", createPriceTable, {date: pdate, sites: s}, {});
+    }
+    var oilTable = null;
+    function initOil() {
+
+      oilTable = $('#oilTable').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+          'excel', 'pdf', 'print',
+          {
+               text: 'Add oil/lottery',
+               action: function ( e, dt, node, config ) {
+                  $("#oilForm")[0].reset();
+                  $("#modalOilForm").attr("mode", "add");
+                  $("#modalOilForm").modal("show");
+               }
+           },
+           {
+                text: 'Create sale action',
+                action: function ( e, dt, node, config ) {
+                  $("#oilActions").modal("show");
+                }
+            },
+        ],
+        "processing": true,
+        "serverSide": true,
+        "ajax": url + "oillottery.php",
+        "columnDefs": [
+          {
+            'targets': 0,
+            'data': "oilid"
+          },
+          {
+            'targets': 1,
+            'data': "name",
+            orderable: true
+          },
+          {
+            'targets': 2,
+            'data': "type",
+            orderable: false,
+            render: function (data, type, row, meta) {
+                var html = (data == "1") ? "Oil" : "Lottery";
+                return html;
+            }
+          },
+          {
+            'targets': 3,
+            'data': "price",
+            orderable: true
+          },
+          {
+            'targets': 4,
+            'data': "discount",
+            orderable: true
+          },
+          {
+            'targets': 5,
+            'data': "active",
+            orderable: false,
+            render: function (data, type, row, meta) {
+                var html = (data == "1") ? "Yes" : "No";
+                return html;
+            }
+          },
+          {
+            'targets': 6,
+            'data': "date_added",
+            orderable: true
+          },
+          {
+            'targets': 7,
+            'data': null,
+            orderable: false,
+            render: function (data, type, row, meta) {
+                var html = '<button onclick="editOil(this.parentNode.parentNode);" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></button>';
+                html += '<button onclick="deleteOil(this.parentNode.parentNode);" style="margin-left:5px;" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></button>';
+                html += '<button onclick="specialOil(this.parentNode.parentNode);" style="margin-left:5px;" class="btn btn-primary btn-xs">Sites settings</button>';
+                return html;
+            }
+          },
+        ]
+      } );
+    }
+
+    function addEditOil() {
+      var dt = new Date();
+      $("#date_added").val(dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0") + " " + dt.getHours().toString().padStart(2, "0") + ":" + dt.getMinutes().toString().padStart(2, "0") + ":" + dt.getSeconds().toString().padStart(2, "0"));
+      var obj = {};
+      $.each($("#modalOilForm").find("[name]"), function() {
+        obj[$(this).attr("name")] = $(this).val();
+      });
+
+      if ($("#modalOilForm").attr("mode") == "add") {
+        delete obj.oilid;
+        api.call("createOil", function(res) {
+          if (res.status == "fail") {
+            swal({
+              type: "error",
+              text: res.error
+            });
+          }
+          if (res.status == "ok") {
+            oilTable.ajax.reload( null, false );
+           $('#oilForm')[0].reset();
+            var o = {
+              siteid: res.siteid,
+              date: pdate
+            }
+
+          }
+        }, obj, {})
+      }
+      if ($("#modalOilForm").attr("mode") == "edit") {
+
+        api.call("editOil", function(res) {
+          if (res.status == "fail") {
+            swal({
+              type: "error",
+              text: res.error
+            });
+          }
+          if (res.status == "ok") {
+            oilTable.ajax.reload( null, false );
+            $("#modalOilForm").modal("hide");
+            swal({
+              type: "success",
+              text:  "Updatet succesfully"
+            });
+          }
+        }, obj, {})
+      }
+    }
+    function editOil(row) {
+      $("#modalOilForm").attr("mode", "edit");
+      oilValidator.resetForm();
+      $("#modalOilForm").find("#oilid").val($(row).find("td").eq(0).html().trim());
+      $("#modalOilForm").find("#name").val($(row).find("td").eq(1).html().trim());
+      $("#modalOilForm").find("#type").val(($(row).find("td").eq(2).html().trim() == "Oil") ? "1" : "2");
+      $("#modalOilForm").find("#price").val($(row).find("td").eq(3).html().trim());
+      $("#modalOilForm").find("#discount").val($(row).find("td").eq(4).html().trim());
+      $("#modalOilForm").find("#active").val(($(row).find("td").eq(5).html().trim() == "Yes") ? "1" : "0");
+      $("#modalOilForm").find("#date_added").val($(row).find("td").eq(6).html().trim());
+      $("#modalOilForm").modal("show");
+    }
+    function deleteOil(row) {
+      swal({
+        type: "question",
+        showCancelButton: true,
+        text: "Are you sure? User " + $(row).find("td").eq(1).html() + " will be deactivated!"
+      }).then((result) => {
+        if (result.value) {
+          var obj = {
+            oilid: $(row).find("td").eq(0).html().trim()
+          }
+          api.call("deactivateOil", function(res) {
+            if (res.status == "fail") {
+              swal({
+                type: "error",
+                text: res.error
+              });
+            }
+            if (res.status == "ok") {
+              oilTable.ajax.reload( null, false );
+
+              swal({
+                type: "success",
+                text: "Oil/Lottery deactivated succesfully"
+              });
+            }
+          }, obj, {})
+        }
+      });
+    }
+    function specialOil(el) {
+      var $el = $(el);
+      $("#specialOilForm").attr("oilid", $el.find("td").eq(0).html().trim());
+      $("#specialOilForm").find("#price").val($el.find("td").eq(3).html().trim());
+      $("#specialOilForm").find("#discount").val($el.find("td").eq(4).html().trim());
+      $("#specialOilForm").modal("show");
+    }
+    function submitSpecialOil(el) {
+      var $el = $(el);
+      if ($("#selectOilSites").val() == null) {
+        swal({
+          type: "question",
+          text: "Delete all special settings for selected oil/lottery"
+        }).then((result) => {
+          var obj = {
+            oilid: $("#specialOilForm").attr("oilid")
+          }
+          $("#specialOilForm").modal("hide");
+          api.call("deleteOilSettings", function(res) {}, obj, {});
+        });
+        return;
+      }
+      var oilid = $("#specialOilForm").attr("oilid");
+      var sites = $("#selectOilSites").val();
+      var obj = {
+        oilid: oilid,
+        sites: sites
+      }
+      $.each($("#specialOilForm").find("[name]"), function() {
+        obj[$(this).attr("name")] = $(this).val();
+      })
+      api.call("oilSpecialPrices", function(res) {
+        if (res.status == "ok") {
+          swal({
+            type: "success",
+            text: "Setting complete"
+          })
+          $("#specialOilForm").modal("hide");
+        }
+      }, obj, {});
+    }
+    function submitDeleteAction() {
+      if ($("#selectOils").val() == null && $("#selectOilSites1").val() == null) {
+        swal({
+          type: "error",
+          text: "No oil/lottery and site(s) selected"
+        })
+        return;
+      }
+        swal({
+          type: "question",
+          text: "Delete all special settings/actions for selected oils/lotteries on selected site(s)"
+        }).then((result) => {
+          var obj = {
+            oils: ($("#selectOils").val() != null) ? $("#selectOils").val() : [],
+            sites: ($("#selectOilSites1").val() != null) ? $("#selectOilSites1").val() : []
+          }
+          $("#actionForm").modal("hide");
+          api.call("deleteOilActions", function(res) {
+            $("#actionForm").find("form").eq(0)[0].reset();
+          }, obj, {});
+        });
+
+    }
+    function submitAction() {
+      if ($("#selectOils").val() == null || $("#selectOilSites1").val() == null) {
+        swal({
+          type: "error",
+          text: "Both: oil(s) and site(s) must be selected"
+        })
+        return;
+      }
+      var obj = {
+        oils: ($("#selectOils").val() != null) ? $("#selectOils").val() : [],
+        sites: ($("#selectOilSites1").val() != null) ? $("#selectOilSites1").val() : [],
+        discount: $("#oilActions").find("#discount").val(),
+        special_offer_text: $("#oilActions").find("#special_offer_text").val(),
+      }
+      $("#actionForm").modal("hide");
+      api.call("createOilActions", function(res) {
+        $("#oilActions").find("form").eq(0)[0].reset();
+        $("#oilActions").modal("hide");
+      }, obj, {});
+
+    }
+    function addService() {
+      if ($("#serviceSites").val() == "-1") {
+        swal({
+          type: "error",
+          text: "Select site please"
+        })
+      }
+      if ($("#serviceSites").val() == "-1") {
+        return;
+      }
+
+      swal({
+        type: "question",
+        showCancelButton: true,
+        confirmButtonText: "Add",
+        title: "Enter service data",
+        html: "<input type='text' id='serviceLabel' placeholder='Service label'/><br /><input style='margin-top:5px;' type='number' id='serviceCounters' placeholder='Number of counters' />"
+      }).then((result) => {
+        if (result.value) {
+          var dt = new Date();
+          var d = dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0");
+
+          var obj = {
+            siteid: $("#serviceSites").val(),
+            label: $("#serviceLabel").val(),
+            counters: $("#serviceCounters").val(),
+            date_added: d
+          }
+          api.call("insertSiteService", function(res) {
+            serviceSiteChanged(document.getElementById("serviceSites"));
+          }, obj, {});
+        }
+      })
+    }
+    function drawServices(res) {
+
+      $("#servicesList").html("");
+      $.each(res.records, function() {
+        var did = "serviceDiv_" + this.serviceid;
+        var tid = "serviceTable_" + this.serviceid;
+        var $dv = $("<div service id='" + did + "' class='service' siteid='" + this.siteid + "' serviceid='" + this.serviceid + "'></div>").appendTo($("#servicesList"));
+        $("<h4>" + this.label + "</h4><span onclick='deleteService(this);' style='cursor:pointer;position:absolute; right: 7px;'>X</span>").appendTo($("#" + did));
+        var $dv1 = $(document.createElement("DIV"));
+        $dv1.css({
+            padding: 10
+        });
+
+        for (i=0;i<parseInt(this.counters);i++) {
+          var slct = document.createElement("INPUT");
+          var $d = $("<div></div>");
+          slct.className = "form-control";
+          $(slct).attr("serviceid", this.serviceid);
+          $(slct).attr("counterid", "-1");
+          $(slct).attr("siteid", this.siteid);
+          $(slct).attr("placeholder", "Label");
+          $(slct).css({
+            width: 200,
+            float: "left"
+          })
+          $(slct).appendTo($d);
+          $("<input style='width:60px;float:left;margin-left: 5px;' class='form-control' type='text' placeholder='price' value='' />").appendTo($d);
+          $("<input style='margin-left: 5px;width:100px;float:left;' class='form-control' type='text' placeholder='start' value='' />").appendTo($d);
+
+          $d.appendTo($dv1);
+          $d.find("input").bind("change", function(event) {
+            var $el = $(event.target);
+            var $dv = $el.parent();
+            var obj = {
+              siteid: $dv.find("[counterid]").attr("siteid"),
+              counterid: $dv.find("[counterid]").attr("counterid"),
+              serviceid: $dv.find("[counterid]").attr("serviceid"),
+              label: $dv.find("input").eq(0).val(),
+              price: $dv.find("input").eq(1).val(),
+              start: $dv.find("input").eq(2).val()
+            }
+
+            var mode = "update";
+            if ($dv.find("[counterid]").attr("counterid") == "-1") {
+              mode = "add";
+            }
+
+            api.call("insertUpdateCounter", function(res) {
+              $dv.find("[counterid]").attr("counterid", res.counterid);
+
+            }, obj, {})
+          })
+        }
+
+        $dv1.appendTo($dv);
+        var ths = this;
+        var o = {
+          siteid: ths.siteid,
+          serviceid: ths.serviceid
+        }
+        api.call("getServiceCounters", function(r) {
+          $.each(r.records, function() {
+            var $dv = $("#" + "serviceDiv_" + this.serviceid);
+            var $slct = $dv.find("[counterid='-1']").eq(0);
+            $slct.attr("counterid", this.counterid);
+            $slct.val(this.label);
+            $slct.next("input").val(this.price);
+            $slct.next("input").next("input").val(this.start);
+          });
+        }, o, {});
+      });
+    }
+    function changeProduct(el) {
+      var $el = $(el);
+      var $tr = $el.parent().parent();
+      var obj = {
+        id: productsTable.row( $tr ).data().id,
+        name:el.value
+      }
+      api.call("updateProduct", function(res) {
+      }, obj, {})
+    }
+    function deleteProduct(tr) {
+
+      var $tr = $(tr);
+    
+      var obj = {
+        id: productsTable.row( $tr ).data().id
+      }
+      swal({
+        showCancelButton: true,
+        type: "question",
+        text: "Are you sure? " + productsTable.row( $tr ).data().name + " will be deleted permanently"
+      }).then((result) => {
+        if (result.value) {
+          api.call("deleteProduct", function(res) {
+            productsTable.ajax.reload( null, false );
+           }, obj, {})
+        }
+      })
+
+    }
+  </script>
+
+  </body>
+</html>
