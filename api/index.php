@@ -935,4 +935,92 @@
     }
     return $res;
   }
+  function getPayments($post, $mysqli) {
+    $rows = [];
+    $sql = "select * from `payment_methods`";
+    $result = $mysqli->query($sql);
+    while ($row = mysqli_fetch_assoc($result)) {
+      $rows[$row["id"]] = $row;
+    }
+    return $rows;
+  }
+  function addPayment($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "insert into `payment_methods` (`name`) Values ('$name')";
+    $row = [];
+    if (!mysqli_query($mysqli,$sql)) {
+      $row["status"] = "fail";
+      $row["error"] = mysqli_error($mysqli);
+    } else {
+      $row["status"] = "ok";
+      $row["id"] = $mysqli->insert_id;
+    }
+    return $row;
+  }
+  function updatePayment($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "update `payment_methods` SET `name`='$name' WHERE `id`='$id'";
+    $row = [];
+    if (!mysqli_query($mysqli,$sql)) {
+      $row["status"] = "fail";
+      $row["error"] = mysqli_error($mysqli);
+    } else {
+      $row["status"] = "ok";
+    }
+    return $row;
+  }
+  function deletePayment($post, $mysqli) {
+    $sql = "delete from `payment_methods`  WHERE `id`='" . $post["id"] . "'";
+    $row = [];
+    if (!mysqli_query($mysqli,$sql)) {
+      $row["status"] = "fail";
+      $row["error"] = mysqli_error($mysqli);
+    } else {
+      $row["status"] = "ok";
+    }
+    return $row;
+  }
+  function getPaymentsDone($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $res = [];
+    $sql = "select `payments`.*, `payment_methods`.`name` from `payments`
+            left join `payment_methods` on `payment_methods`.`id`=`payments`.`id`
+            where siteid='" . $post["siteid"] . "' and `date`='$date' order by `payment_methods`.`name`";
+    $res["sql"] = $sql;
+    $result = $mysqli->query($sql);
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+      $res["records"] = [];
+      while ($row = mysqli_fetch_assoc($result)) {
+        $res["records"][$row["id"]] = $row;
+      }
+    }
+    return $res;
+  }
+  function insertUpdatePayment($post, $mysqli) {
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $res = [];
+    $res["error"] = [];
+    $res["sql"] = [];
+    $sql = "insert into `payments` (`date`,`siteid`,`id`,`value`) values ('$date', '$siteid','$id','$value')
+      ON DUPLICATE KEY UPDATE  `value`='$value'";
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
 ?>
