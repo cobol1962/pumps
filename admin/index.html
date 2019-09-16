@@ -45,12 +45,14 @@
       })
       function login() {
 
-        var obj = {};
+        var obj = {
+          user_type: "1"
+        };
         obj.username = $("#username").val();
         obj.password = $("#password").val();
 
           api.call("login", function(res) {
-          
+
             if (res.status == "fail") {
               $("#loginStatus").html(res.error);
 
@@ -62,7 +64,7 @@
                 window.location.href = "admin.html";
               } else {
                 localStorage.referer = "index.html";
-                window.location.href = "/user";
+                window.location.href = "/user/user.html";
               }
             }
           }, obj, {})

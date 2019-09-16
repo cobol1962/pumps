@@ -16,25 +16,33 @@
   echo json_encode($r);
   exit;
   function login($post, $mysqli) {
-    $sql = "SELECT * from `admin` WHERE `username`='" . $post["username"] . "' AND `password`='" . $post["password"] . "'";
-    $result = $mysqli->query($sql);
-    if ($result->num_rows > 0) {
-      $row = mysqli_fetch_assoc($result);
-      $row["siteid"] = "0";
-      $row["user_type"] = "1";
-      $row["status"] = "ok";
-      return $row;
+    foreach ($post as $k => $v) {
+      $$k = $v;
     }
-    $sql = "SELECT * from `users` WHERE `site`='" . $post["username"] . "' AND `password`='" . $post["password"] . "' and `active`='1'";
-    $result = $mysqli->query($sql);
-    if ($result->num_rows > 0) {
-      $row = mysqli_fetch_assoc($result);
-      $row["siteid"] = $row["id"];
-      $row["user_type"] = "0";
-      $row["status"] = "ok";
-      return $row;
+    if ($user_type == "1") {
+      $sql = "SELECT * from `admin` WHERE `username`='" . $post["username"] . "' AND `password`='" . $post["password"] . "'";
+      $result = $mysqli->query($sql);
+      if ($result->num_rows > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $row["siteid"] = "0";
+        $row["user_type"] = "1";
+        $row["status"] = "ok";
+        return $row;
+      }
+    }
+    if ($user_type == "0") {
+      $sql = "SELECT * from `users` WHERE `site`='" . $post["username"] . "' AND `password`='" . $post["password"] . "' and `active`='1'";
+      $result = $mysqli->query($sql);
+      if ($result->num_rows > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $row["siteid"] = $row["id"];
+        $row["user_type"] = "0";
+        $row["status"] = "ok";
+        return $row;
+      }
     }
     $row = [];
+
     $row["status"] = "fail";
     $row["error"] = "Invalid username/password.";
     return $row;
@@ -1019,6 +1027,22 @@
       $res["status"] = "fail";
       $res["error"] = mysqli_error($mysqli);
     } else {
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
+  function listSites($post, $mysqli) {
+    $res = [];
+
+    $s_sql = "select *  from `users`";
+    $s_res = $mysqli->query($s_sql);
+    if (!mysqli_query($mysqli,$s_sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      while ($row = mysqli_fetch_assoc($s_res)) {
+        $res["records"][] = $row;
+      }
       $res["status"] = "ok";
     }
     return $res;

@@ -97,8 +97,15 @@
             <div class="nav notify-row" id="top_menu">
             </div>
             <div class="top-menu">
+
             	<ul class="nav pull-right top-menu">
-                    <li><a class="logout" onclick="delete localStorage.user;window.location.href = 'index.html';">Logout</a></li>
+                  <li >
+                      <select id="selectSite" style="position:relative;right:10px;margin-top:10px;" class="form-control" onchange="switchSite(this);">
+                        <option value="-1">Select site</option>
+                      </select>
+                  </li>
+                  <li><a class="logout" style="background:white;color:black;" onclick="window.location.href = '/reports';">Reports</a></li>
+                  <li><a class="logout" onclick="delete localStorage.user;window.location.href = 'index.html';">Logout</a></li>
             	</ul>
             </div>
         </header>
@@ -159,6 +166,7 @@
       </aside>
       <section id="main-content">
           <section page class="wrapper" id="users">
+
           	<h3><i class="fa fa-angle-right"></i> Manage Users</h3>
 			        <div class="row">
                   <div class="col-md-12">
@@ -605,6 +613,9 @@
             enableFiltering: true
         });
       }, {}, {});
+
+
+
       var ww = setInterval( function()  {
         if (siteList != null) {
           clearInterval(ww);
@@ -612,6 +623,7 @@
           var slist = _.sortBy(siteList,"site");
           $.each(slist, function() {
             $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectSites"));
+            $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectSite"));
             $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectOilSites"));
             $("<option value='" + this.id + "'>" + this.site + "</option>").appendTo($("#selectOilSites1"));
 
@@ -1549,7 +1561,7 @@
 
     function addEditOil() {
       var dt = new Date();
-      $("#date_added").val(dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0") + " " + dt.getHours().toString().padStart(2, "0") + ":" + dt.getMinutes().toString().padStart(2, "0") + ":" + dt.getSeconds().toString().padStart(2, "0"));
+      $("#date_added").val(dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0"));
       var obj = {};
       $.each($("#modalOilForm").find("[name]"), function() {
         obj[$(this).attr("name")] = $(this).val();
@@ -1923,6 +1935,12 @@
           }
         }, obj , {})
       })
+    }
+    function switchSite(el) {
+      var usr = $.parseJSON(localStorage.user);
+      usr.siteid = el.value;
+      localStorage.user = JSON.stringify(usr);
+      window.location.href = "/user/user.html";
     }
   </script>
 
