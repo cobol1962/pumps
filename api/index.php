@@ -1047,4 +1047,82 @@
     }
     return $res;
   }
+  function listMethods($post, $mysqli) {
+    $res = [];
+
+    $s_sql = "select *  from `payment_methods`";
+    $s_res = $mysqli->query($s_sql);
+    if (!mysqli_query($mysqli,$s_sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      while ($row = mysqli_fetch_assoc($s_res)) {
+        $res["records"][] = $row;
+      }
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
+  function listFuel($post, $mysqli) {
+    $res = [];
+
+    $s_sql = "select *  from `fuel`";
+    $s_res = $mysqli->query($s_sql);
+    if (!mysqli_query($mysqli,$s_sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      while ($row = mysqli_fetch_assoc($s_res)) {
+        $res["records"][] = $row;
+      }
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
+  function listTypes($post, $mysqli) {
+    $res = [];
+
+    $s_sql = "select *  from `sale_types`";
+    $s_res = $mysqli->query($s_sql);
+    if (!mysqli_query($mysqli,$s_sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      while ($row = mysqli_fetch_assoc($s_res)) {
+        $res["records"][] = $row;
+      }
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
+  function submitFuelFales($post, $mysqli) {
+    $res = [];
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "update fuel_sales set submitted=1 where date='$date' and siteid='$siteid'";
+
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
+  function submitOilSales($post, $mysqli) {
+    $res = [];
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "update `sales_oil_lottery` set submitted=1 where date='$date' and siteid='$siteid'";
+
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
 ?>

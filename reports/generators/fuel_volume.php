@@ -13,8 +13,8 @@ $methods = $meth;
 sort($methods);
 $mnames = [];
 foreach ($methods as $m) {
-  $sql = "select name from payment_methods where id=$m";
-  $mnames[$m] = mysqli_fetch_assoc($mysqli->query($sql))["name"];
+  $sql = "select grade from fuel where id=$m";
+  $mnames[$m] = mysqli_fetch_assoc($mysqli->query($sql))["grade"];
 }
 foreach ($sites as $s) {
   $sql = "select id,site from users where id=$s";
@@ -22,7 +22,7 @@ foreach ($sites as $s) {
 }
 
 $sit = implode(",", $sites);
-$sql = "select distinct siteid from payments where siteid IN($sit) order by id";
+$sql = "select distinct siteid from fuel_sales where submitted=1 and siteid IN($sit) order by fuelid";
 $r = $mysqli->query($sql);
 if ($timeline == "sum") {
   if ($grouping == "sites") {
@@ -30,14 +30,14 @@ if ($timeline == "sum") {
         $table[$row["siteid"]] = $row["id"];
         $site = $row["siteid"];
         foreach ($methods as $m) {
-          $sum = "select IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+          $sum = "select IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid=$site and fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto')";
           $rsum = $mysqli->query($sum);
           $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
         }
       }
   } else {
     foreach ($methods as $m) {
-      $sum = "select IFNULL(sum(value),0) as s from payments where siteid IN ($sit) AND id=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+      $sum = "select IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid IN ($sit) AND fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto')";
       $rsum = $mysqli->query($sum);
       $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
     }
@@ -49,13 +49,13 @@ if ($timeline != "sum") {
         $site =$row["siteid"];
         foreach ($methods as $m) {
           if ($timeline == "day") {
-            $sum = "select date,siteid,IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
+            $sum = "select date,siteid,IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid=$site and fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
           }
           if ($timeline == "week") {
-            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
+            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid=$site and fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
           }
           if ($timeline == "month") {
-            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
+            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid=$site and fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
           }
           $rsum = $mysqli->query($sum);
           if (mysqli_num_rows($rsum) == 0) {
@@ -71,14 +71,14 @@ if ($timeline != "sum") {
   } else {
     foreach ($methods as $m) {
       if ($timeline == "day") {
-        $sum = "select date,IFNULL(sum(value),0) as s from payments where siteid in($sit) AND id=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
+        $sum = "select date,IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid in($sit) AND fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
       }
 
       if ($timeline == "week") {
-        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(value),0) as s from payments where siteid in($sit) AND id=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
+        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid in($sit) AND fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
       }
       if ($timeline == "month") {
-        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(value),0) as s from payments where siteid in($sit) AND  id=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
+        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(counter),0) as s from fuel_sales where submitted=1 and siteid in($sit) AND  fuelid=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
       }
       $rsum = $mysqli->query($sum);
       while ($row = mysqli_fetch_assoc($rsum)) {
@@ -187,9 +187,9 @@ $dt = json_encode($table);
               <? } ?>
               <?php
                 foreach ($methods as $m) {
-                  $sql = "select name from payment_methods where id=$m";
+                  $sql = "select grade from fuel where id=$m";
                   $r = $mysqli->query($sql);
-                  echo "<th>" . mysqli_fetch_assoc($r)["name"] . "</th>";
+                  echo "<th>" . mysqli_fetch_assoc($r)["grade"] . "</th>";
                 }
                 echo "<th>Total</th>";
                ?>
@@ -208,9 +208,9 @@ $dt = json_encode($table);
                     foreach ($v as $value) {
                       $sum = $sum + $value;
                     ?>
-                      <td><?=utf8_encode(money_format('%n', $value))?></td>
+                      <td><?=number_format($value)?></td>
                     <?php } ?>
-                    <td><?=utf8_encode(money_format('%n', $sum))?></td>
+                    <td><?=number_format($value)?></td>
                     </tr>
               <?php   } ?>
             <?php } ?>
@@ -224,10 +224,10 @@ $dt = json_encode($table);
                     foreach ($v as $value) {
                       $sum = $sum + $value;
                     ?>
-                      <td><?=utf8_encode(money_format('%n', $value))?></td>
+                      <td><?=number_format($value)?></td>
                     <?php } ?>
 
-                    <td><?=utf8_encode(money_format('%n', $sum))?></td>
+                    <td><?=number_format($value)?></td>
                     </tr>
               <?php   } ?>
             <?php } ?>
@@ -255,9 +255,9 @@ $dt = json_encode($table);
                             $total[$m] = $total[$m] + $value;
                             $sum = $sum + $value;
                           ?>
-                            <td><?=utf8_encode(money_format('%n', $value))?></td>
+                            <td><?=number_format($value)?></td>
                           <?php } ?>
-                          <td><?=utf8_encode(money_format('%n', $sum))?></td>
+                          <td><?=number_format($value)?></td>
                           </tr>
                         <?php } ?>
                   <?php } ?>
@@ -268,9 +268,9 @@ $dt = json_encode($table);
                       foreach($total as $t) {
                         $t1 = $t1 + $t;
                          ?>
-                        <td><strong><?=utf8_encode(money_format('%n', $t))?></strong></td>
+                        <td><strong><?=number_format($t)?></strong></td>
                     <?php }  ?>
-                    <td><strong><?=utf8_encode(money_format('%n', $t1))?></strong></td>
+                    <td><strong><?=number_format($t1)?></strong></td>
                   </tr>
                   <?php } ?>
               <?php   } ?>
@@ -285,7 +285,7 @@ $dt = json_encode($table);
                     <th>Total</th>
                     <?php
                       foreach ($methods as $m) {
-                        $sql = "select name from payment_methods where id=$m";
+                        $sql = "select grade from fuel where id=$m";
                         $r = $mysqli->query($sql);
                         echo "<th style='padding-right:7px;font-wight:bold;'>0.00</th>";
                       }
@@ -296,6 +296,7 @@ $dt = json_encode($table);
               <?php } ?>
               <?php
             if ($timeline != "sum" && $grouping == "sum") {
+
                 setlocale(LC_MONETARY, 'en_GB');
                     foreach($table as $k =>$v) {
                       echo "<tr><td>" . $k . "</td>";
@@ -307,9 +308,9 @@ $dt = json_encode($table);
                         $sum = $sum + $value;
 
                       ?>
-                        <td><?=utf8_encode(money_format('%n', $value))?></td>
+                        <td><?=number_format($value)?></td>
                       <?php } ?>
-                      <td><?=utf8_encode(money_format('%n', $sum))?></td>
+                      <td><?=number_format($value)?></td>
                       </tr>
                 <?php   } ?>
                 <tfoot>
@@ -318,7 +319,7 @@ $dt = json_encode($table);
                     <th>Total</th>
                     <?php
                       foreach ($methods as $m) {
-                        $sql = "select name from payment_methods where id=$m";
+                        $sql = "select grade from fuel where id=$m";
                         $r = $mysqli->query($sql);
                         echo "<th style='padding-right:7px;font-wight:bold;'>0.00</th>";
                       }
@@ -337,7 +338,6 @@ $dt = json_encode($table);
   </body>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-
   var data = <?php echo json_encode($table) ?>;
   var methods = <?php echo json_encode($mnames) ?>;
   var mth = <?php echo json_encode($methods) ?>;
@@ -397,10 +397,11 @@ $dt = json_encode($table);
     for (var prop in sData) {
       graphData[sites[prop]] =  gData[prop];
     }
-
     $("<option sum value='ColumnChart'>Column Chart(Sum)</option>").appendTo($("#chartType"));
+    $("<option sum value='ColumnChart'>Stacked Column Chart</option>").appendTo($("#chartType"));
     $("<option value='ColumnChart'>Column Chart</option>").appendTo($("#chartType"));
     $("<option value='BarChart'>Bar Chart</option>").appendTo($("#chartType"));
+    $("<option value='BarChart'>Stacked Bar Chart</option>").appendTo($("#chartType"));
     $("<option value='BarChart'>Bar Chart(Sum)</option>").appendTo($("#chartType"));
     $("#chartType").unbind("change");
     $("#chartType").bind("change", function() {
@@ -415,6 +416,7 @@ $dt = json_encode($table);
       }
     }, 100);
   }
+
 
   if (g == "sum" && t != "sum") {
 
@@ -476,11 +478,11 @@ $dt = json_encode($table);
     } );
     setTimeout(function() {
        rt = $("#reportTable").DataTable({
+         "download": "open",
           "paging": false,
           "sorting": false,
           dom: 'Bfrtip',
            buttons: [
-
              'colvis',
               { extend: 'print', footer: true, exportOptions: {
                     columns: ':visible'
@@ -517,6 +519,7 @@ $dt = json_encode($table);
               },
               title: "Title",
               download: "open",
+              orientation: 'landscape',
               customize: function ( doc ) {
                 doc.content[0].text =  $("#rTitle").val();
                   if ($("#printOption").val() == "all" || $("#printOption").val() == "chart") {
@@ -529,8 +532,7 @@ $dt = json_encode($table);
                     if ($("#printOption").val() != "all" && $("#printOption").val() != "table") {
                         doc.content[1] = "";
                     }
-
-              }
+                  }
 
             },
            ],
@@ -585,7 +587,7 @@ $dt = json_encode($table);
       }
 
       data.addRows( dt );
-      var options = {'title':'Payments by methods',
+      var options = {'title':'Sales by fuel',
                       'width': 750,
                       'height': 500};
 
@@ -646,7 +648,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Payments by sites',
+      var options = {'title':'Sales by sites',
                       'width': 750,
                       'height': 500};
 
@@ -708,7 +710,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Payments by period',
+      var options = {'title':'Fuel sale by period',
                       'width': 750,
                       'height': 500};
 
@@ -797,7 +799,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Payments by period',
+      var options = {'title':'Fuel sale by period',
                       'width': 750,
                       'height': 500};
 

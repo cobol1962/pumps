@@ -27,6 +27,9 @@
     #productsTable_filter {
       display: none;
     }
+    input.error {
+      border: 2px solid red;
+    }
     input[type=number]::-webkit-inner-spin-button,
       input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
@@ -171,7 +174,7 @@
               <div class="sidebar-toggle-box">
                   <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
               </div>
-            <a href="#" class="logo"><b>Admin Dashboard</b></a> 
+            <a href="#" class="logo"><b>Admin Dashboard</b></a>
             <div class="nav notify-row" id="top_menu">
             </div>
             <div class="top-menu">
@@ -259,9 +262,11 @@
 
 
          <section page class="wrapper" id="fuelSales" style="display:none;padding: 20px;">
-            <div style="margin:20px auto;width:220px;">
+            <div style="margin:20px auto;width:420px;">
+              <table><tr><td>
               <label for="salesDate">Select date</label>
               <input type="text" class="form-control" id="salesDate" style="width:200px;">
+            </td><td><button onclick="sendFuel();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
             </div>
             <h2 totalsales>Total fuel sales: &#163;0.00</h2>
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="saleSheet">
@@ -270,10 +275,13 @@
          </section>
 
          <section page class="wrapper" id="oilSales" style="display:none;padding: 20px;">
-            <div style="margin:20px auto;width:220px;">
+            <div style="margin:20px auto;width:420px;">
+
+            <table><tr><td>
               <label for="oilSalesDate">Select date</label>
               <input type="text" class="form-control" id="oilSalesDate" style="width:200px;">
-            </div>
+            </td><td><button onclick="sendOil();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
+          </div>
             <h2 totaloilsales>Total oil & lottery sales: &#163;0.00</h2>
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;"  class='oil' id="oilSaleSheet">
               <table class="table table-striped table-advance table-hover" id="oilSalesTable">
@@ -301,8 +309,11 @@
          </section>
          <section page class="wrapper" id="serviceSales" style="display:none;padding: 20px;">
             <div style="margin:20px auto;width:220px;">
-              <label for="servicesSalesDate">Select date</label>
-              <input type="text" class="form-control" id="serviceSalesDate" style="width:200px;">
+              <table><tr><td>
+                <label for="servicesSalesDate">Select date</label>
+                <input type="text" class="form-control" id="serviceSalesDate" style="width:200px;">
+              </td><td><button onclick="sendServices();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
+
             </div>
             <h2 totalservicesales>Total services sales: &#163;0.00</h2>
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="serviceSaleSheet">
@@ -408,6 +419,7 @@
         </div>
     </div>
     <script src="/assets/js/jquery.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <script class="include" type="text/javascript" src="/assets/js/jquery.dcjqaccordion.2.7.js"></script>
     <script src="/assets/js/jquery.scrollTo.min.js"></script>
@@ -518,14 +530,14 @@
                     }
 
                     if (start.length == 0 &&  last.length == 0) {
-                      var $sls = $("<tr fuelid='" + ths.fuelid + "' nozzleid='" + ths.nozzleid + "' pumpid='" + ths.pumpid + "'><td>" + this.grade + "</td><td>" + s + "</td><td></td><td><input onchange='calculateSale(this);' style='width:80px;' class='form-control' type='number' /></td><td>" + p + "</td><td></td></tr>");
+                      var $sls = $("<tr fuelid='" + ths.fuelid + "' nozzleid='" + ths.nozzleid + "' pumpid='" + ths.pumpid + "'><td>" + this.grade + "</td><td>" + s + "</td><td></td><td><input fuelenter onchange='calculateSale(this);' style='width:80px;' class='form-control' type='number' /></td><td>" + p + "</td><td></td></tr>");
                     }
                     if (start.length > 0 && last.length == 0)  {
                       var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(start[0].value));
-                      var $sls = $("<tr fuelid='" + ths.fuelid + "' nozzleid='" + ths.nozzleid + "' pumpid='" + ths.pumpid + "'><td>" + this.grade + "</td><td>" + start[0].start + "</td><td>" + start[0].counter + "</td><td><input value='" + start[0].end + "' onchange='calculateSale(this);' style='width:80px;' class='form-control' type='number' /></td><td>" + start[0].price + "</td><td total='" + start[0].value + "'>" + fmt + "</td></tr>");
+                      var $sls = $("<tr fuelid='" + ths.fuelid + "' nozzleid='" + ths.nozzleid + "' pumpid='" + ths.pumpid + "'><td>" + this.grade + "</td><td>" + start[0].start + "</td><td>" + start[0].counter + "</td><td><input fuelenter value='" + start[0].end + "' onchange='calculateSale(this);' style='width:80px;' class='form-control' type='number' /></td><td>" + start[0].price + "</td><td total='" + start[0].value + "'>" + fmt + "</td></tr>");
                     }
                     if (start.length == 0 && last.length > 0)  {
-                      var $sls = $("<tr fuelid='" + ths.fuelid + "' nozzleid='" + ths.nozzleid + "' pumpid='" + ths.pumpid + "'><td>" + this.grade + "</td><td>" + last[0].end + "</td><td></td><td><input  onchange='calculateSale(this);' style='width:80px;' class='form-control' type='number' /></td><td>" + p + "</td><td></td></tr>");
+                      var $sls = $("<tr fuelid='" + ths.fuelid + "' nozzleid='" + ths.nozzleid + "' pumpid='" + ths.pumpid + "'><td>" + this.grade + "</td><td>" + last[0].end + "</td><td></td><td><input fuelenter onchange='calculateSale(this);' style='width:80px;' class='form-control' type='number' /></td><td>" + p + "</td><td></td></tr>");
                     }
                     $sls.appendTo($bdy);
                     if ((ind + 1) == nozzles.length) {
@@ -574,7 +586,7 @@
           gt += parseFloat($(this).attr("ttl"));
         });
         var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(gt);
-        $("[totalservicesales]").html("Total services sales: " + fmt);
+      //  $("[totalservicesales]").html("Total services sales: " + fmt);
       }
       function calculateSale(el) {
         var $el = $(el);
@@ -1035,6 +1047,7 @@
     });
     var tOilSales = null;
     function setOilSales() {
+
       var dEnabled = false;
       var cdt = new Date(oilSaleDate);
       var wdt = new Date(yesterday);
@@ -1075,19 +1088,19 @@
             vl = "value='" + rcd.start + "'";
           }
 
-          var html = "<td start><input onchange='setOilSale(this);' " + vl + " type='number' style='width:100px;' class='form-control' value='0' /></td>";
+          var html = "<td start><input oilstart onchange='setOilSale(this);' " + vl + " type='number' style='width:100px;' class='form-control' value='0' /></td>";
           $(html).appendTo($tr);
 
           if (rcd.input!== undefined) {
             vl = "value='" + rcd.input + "'";
           }
-          var html = "<td added><input onchange='setOilSale(this);' " + vl + " type='number' style='width:100px;' class='form-control' value='0' /></td>";
+          var html = "<td added><input oilinput onchange='setOilSale(this);' " + vl + " type='number' style='width:100px;' class='form-control' value='0' /></td>";
           $(html).appendTo($tr);
 
           if (rcd.end !== undefined) {
             vl = "value='" + rcd.end + "'";
           }
-          var html = "<td end><input " + vl + " onchange='setOilSale(this);' type='number' style='width:100px;' class='form-control' value='0' /></td>";
+          var html = "<td end><input " + vl + " oilend onchange='setOilSale(this);' type='number' style='width:100px;' class='form-control' value='' /></td>";
           $(html).appendTo($tr);
 
           var html = "<td price>" + rcd.price + "</td>";
@@ -1147,14 +1160,21 @@
         })
         return false;
       }
-      var end = parseInt($tr.find("[end]").find("input").val());
-      $tr.find("[sold]").html(start - end);
-      var prc = parseFloat($tr.find("[saleprice]").attr("saleprice"));
-      var vl = prc * (start - end);
-      var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(vl));
-      $tr.find("[total]").html(fmt);
-      $tr.find("[total]").attr("value", vl);
-
+      var endv = $tr.find("[end]").find("input").val();
+      if (endv == "") {
+        var vl = 0;
+        var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(vl));
+        $tr.find("[total]").html(fmt);
+        $tr.find("[total]").attr("value", vl);
+      } else {
+          var end = parseInt($tr.find("[end]").find("input").val());
+          $tr.find("[sold]").html(start - end);
+          var prc = parseFloat($tr.find("[saleprice]").attr("saleprice"));
+          var vl = prc * (start - end);
+          var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(vl));
+          $tr.find("[total]").html(fmt);
+          $tr.find("[total]").attr("value", vl);
+      }
       var obj = {
         date: oilSaleDate,
         siteid: user.siteid,
@@ -1166,20 +1186,25 @@
         price: $tr.find("[price]").html(),
         discount: $tr.find("[discount]").html(),
         sellprice: $tr.find("[saleprice]").attr("saleprice"),
-        value: $tr.find("[total]").attr("value")
+        value: $tr.find("[total]").attr("value"),
+        submitted: 0
       }
       api.call("insertUpdateOilSale", function(res) {
-        calculateOilSales();
+          calculateOilSales();
       }, obj, {});;
 
     }
     function calculateOilSales() {
-      var ttl = 0;
-      $.each($("[total]"), function() {
-        ttl += parseFloat($(this).attr("value"));
-      })
-      var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(ttl));
-      $("[totaloilsales]").html("Total oil & lottery sales: " + fmt);
+
+      setTimeout(function() {
+        var ttl = 0;
+          tOilSales.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+            var node = this.node();
+            ttl += parseFloat($(node).find("[total]").attr("value"));
+          });
+          var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(ttl));
+          $("[totaloilsales]").html("Total oil & lottery sales: " + fmt);
+        }, 10);
     }
 
     function calculateServiceSale(el) {
@@ -1496,6 +1521,189 @@
     api.call("insertUpdatePayment", function(res) {
 
     }, obj, {})
+  }
+  function sendFuel() {
+    var valid = true;
+    $.each($("[fuelenter]"), function() {
+      $(this).removeClass("error");
+      if (!(parseInt(this.value) > 0)) {
+        valid = false;
+        $(this).addClass("error");
+      }
+    });
+    if (!valid) {
+      swal({
+        type: "error",
+        text: "Please enter all sales!"
+      })
+      return;
+    }
+    api.call("submitFuelFales", function(res) {
+
+    },{
+      date:saleDate,
+      siteid: user.siteid
+    }, {})
+    var docDefinition = {
+        content: [
+          {text: user.site + ": Fuel sales for " + saleDate, fontSize: 17 },
+          {text: "Generated " + (new Date()), fontSize: 10 },
+          { text: $("[totalsales]").html(), fontWeight: "bold", margin: [ 0, 5, 10, 0 ]}
+        ]
+    };
+    $.each($("[pump]"), function() {
+      docDefinition.content.push(
+          { text: $(this).find("h4").html(), fontWeight: "bold", margin: [ 0, 10, 10, 0 ]}
+      )
+      var tb = [];
+      $.each($(this).find("thead").find("tr"), function() {
+        var r = [];
+        $.each($(this).find("th"), function() {
+            r.push($(this).html());
+        });
+          tb.push(r);
+      });
+
+      $.each($(this).find("tbody").find("tr"), function() {
+        var r = [];
+        $.each($(this).find("td"), function() {
+          if ($(this).find("input").length == 0) {
+            r.push($(this).html());
+          } else {
+            r.push($(this).find("input").val());
+          }
+        })
+        tb.push(r);
+      });
+
+      docDefinition.content.push(
+        {
+            layout: 'lightHorizontalLines', // optional
+            table: {
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+              headerRows: 1,
+               widths: [ '*', '*', '*', '*', '*', '*' ],
+              body: tb
+            }
+        }
+      )
+    });
+    var pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.getBase64((data) => {
+        $.ajax({
+          url: "mailToAdmin.php",
+          type: "POST",
+          data: {
+            from: user.email,
+            pdf: data,
+            name: "Fuel_sales_" + (new Date()).getTime() + ".pdf",
+            subject: user.site + " Fuel sales " + saleDate,
+            text: "Generated " + (new Date())
+          },
+           success: function() {
+             swal({
+               type: "success",
+               text: "mail sent succesfully"
+             })
+          }
+
+        })
+    });
+  }
+  function sendOil() {
+    var valid = true;
+    $.each($("[oilend]"), function() {
+      var tr = $(this).closest("tr");
+      $(this).removeClass("error");
+      if (this.value == "" && (tr.find("[oilstart]").val() != 0 || tr.find("[oilinput]").val() != 0)) {
+        $(this).addClass("error");
+        valid = false;
+      } else {
+        $(this).removeClass("error");
+      }
+    });
+    if (!valid) {
+      swal({
+        type: "error",
+        text: "Please enter all sales!"
+      })
+      return;
+    }
+    api.call("submitOilSales", function(res) {
+
+    },{
+      date: oilSaleDate,
+      siteid: user.siteid
+    }, {})
+    var docDefinition = {
+      pageOrientation: 'landscape',
+        content: [
+          {text: user.site + ": Oil & Lottery sales for " + oilSaleDate, fontSize: 17 },
+          {text: "Generated " + (new Date()), fontSize: 10 },
+          { text: $("[totaloilsales]").html(), fontWeight: "bold", margin: [ 0, 5, 10, 0 ]}
+        ]
+    };
+
+      var tb = [];
+      $.each($("#oilSalesTable").find("thead").find("tr"), function() {
+        var r = [];
+        $.each($(this).find("th"), function() {
+            r.push($(this).html());
+        });
+        tb.push(r);
+      });
+
+      tOilSales.rows().eq(0).each( function ( index ) {
+        var row = tOilSales.row( index );
+        var r = [];
+        var node = row.node();
+        if ($(node).find("[oilstart]").val() > 0 || $(node).find("[oilend]").val() > 0 || $(node).find("[total]").attr("value") != "0") {
+            $.each($(node).find("td"), function() {
+              if ($(this).find("input").length == 0) {
+                r.push($(this).html());
+              } else {
+                r.push($(this).find("input").val());
+              }
+            });
+            tb.push(r);
+          }
+      } );
+
+      docDefinition.content.push(
+        {
+            layout: 'lightHorizontalLines', // optional
+            table: {
+              // headers are automatically repeated if the table spans over multiple pages
+              // you can declare how many rows should be treated as headers
+              headerRows: 1,
+               widths: [ '*', '*', '*', '*', '*', '*', '*', '*', '*' ],
+              body: tb
+            }
+        }
+      )
+
+    var pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.getBase64((data) => {
+        $.ajax({
+          url: "mailToAdmin.php",
+          type: "POST",
+          data: {
+            from: user.email,
+            pdf: data,
+            name: "Oil_Lottery_sales_" + (new Date()).getTime() + ".pdf",
+            subject: user.site + " Oil & Lottery sales " + saleDate,
+            text: "Generated " + (new Date())
+          },
+           success: function() {
+             swal({
+               type: "success",
+               text: "mail sent succesfully"
+             })
+          }
+
+        })
+    });
   }
   </script>
 

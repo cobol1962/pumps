@@ -21,8 +21,115 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/datatables.min.css"/>
     <script type="text/javascript">
-      function switchTo(page) {
-        $("#reportFrame").attr("src", "http://samygroups.co.uk/reports/generators/" + page + ".php");
+      function switchTo(page, el) {
+        if (page != "summary") {
+          $('#sm').show();
+        } else {
+
+        }
+        $('#sml').show();
+        $('#selectMethods').find("option").remove();
+        try {
+          $('#selectMethods').multiselect('destroy');
+        } catch(e) {
+
+        }
+        if (page == "summary") {
+          api.call("listTypes", function(res) {
+            var slist = _.sortBy(res.records,"name");
+            $.each(slist, function() {
+              $("<option value='" + this.sale_type+ "'>" + this.name + "</option>").appendTo($("#selectMethods"));
+            });
+            $('#selectMethods').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                onChange: function(option, checked, select) {
+                   setSession();
+               },
+               onSelectAll: function() {
+                   setSession();
+              },
+              onDeselectAll: function() {
+                 setSession();
+               }
+            });
+          }, {}, {});
+        }
+        if (page == "revenue") {
+          api.call("listMethods", function(res) {
+            var slist = _.sortBy(res.records,"name");
+            $.each(slist, function() {
+              $("<option value='" + this.id + "'>" + this.name + "</option>").appendTo($("#selectMethods"));
+            });
+            $('#selectMethods').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                onChange: function(option, checked, select) {
+                   setSession();
+               },
+               onSelectAll: function() {
+                   setSession();
+              },
+              onDeselectAll: function() {
+                 setSession();
+               }
+            });
+          }, {}, {});
+        }
+        if (page == "fuel_value" || page == "fuel_volume" || page == "fuel_received") {
+          api.call("listFuel", function(res) {
+            var slist = _.sortBy(res.records,"name");
+            $.each(slist, function() {
+              $("<option value='" + this.id + "'>" + this.grade + "</option>").appendTo($("#selectMethods"));
+            });
+            $('#selectMethods').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                onChange: function(option, checked, select) {
+                   setSession();
+               },
+               onSelectAll: function() {
+                   setSession();
+              },
+              onDeselectAll: function() {
+                 setSession();
+               }
+            });
+          }, {}, {});
+
+        }
+        if (page == "oil_lottery") {
+
+            $("<option value='1'>Oil</option>").appendTo($("#selectMethods"));
+            $("<option value='2'>Lottery</option>").appendTo($("#selectMethods"));
+            $('#selectMethods').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                onChange: function(option, checked, select) {
+                   setSession();
+               },
+               onSelectAll: function() {
+                   setSession();
+              },
+              onDeselectAll: function() {
+                 setSession();
+               }
+            });
+        }
+        try {
+          $('#selectMethods').multiselect('refresh');
+        } catch(e) {
+
+        }
+        $('#selectMethods').multiselect('selectAll', false);
+        $('#selectMethods').multiselect('updateButtonText');
+        setSession();
+        setTimeout(function() {
+          $("#reportFrame").attr("src", "http://samygroups.co.uk/reports/generators/" + page + ".php");
+          $("#nav-accordion").find("a").removeClass("active");
+          $(el).addClass("active");
+        }, 1500);
+
       }
     </script>
     <style>
@@ -54,9 +161,29 @@
               <ul class="sidebar-menu" id="nav-accordion">
             	   <h5 class="centered"></h5>
                     <li class="sub-menu">
-                      <a href="javascript:switchTo('revenue');" class="active">
+                      <a href="#" onclick="switchTo('summary', this);" >
+                          <i class="fa fa-users"></i>
+                          <span><strong>Summaery<strong></span>
+                      </a>
+                      <a href="#" onclick="switchTo('revenue', this);" >
                           <i class="fa fa-users"></i>
                           <span>Payments</span>
+                      </a>
+                      <a href="#" onclick="switchTo('fuel_value', this);">
+                          <i class="fa fa-users"></i>
+                          <span>Fuel (value)</span>
+                      </a>
+                      <a href="#" onclick="switchTo('fuel_volume', this);">
+                          <i class="fa fa-users"></i>
+                          <span>Fuel (volume)</span>
+                      </a>
+                      <a href="#" onclick="switchTo('fuel_received', this);">
+                          <i class="fa fa-users"></i>
+                          <span>Fuel (received)</span>
+                      </a>
+                      <a href="#" onclick="switchTo('oil_lottery', this);">
+                          <i class="fa fa-users"></i>
+                          <span>Oil & lottery</span>
                       </a>
                     </li>
                 </ul>
@@ -82,10 +209,18 @@
                       </select>
                     </td>
                     <td>
+                      <div id="sm">
+                        <label id="sml"  for="selectMethods">Additional filter</label><br />
+                        <select id="selectMethods" multiple="multiple" style="margin-top:10px;min-width:300px;">
+                        </select>
+                      </div>
+                    </td>
+                    <td>
                       <label for="selectSites">Grouping</label><br />
                       <select id="grouping" onchange="setSession();"  class="form-control" style="margin-top:0px;">
                         <option value="sum">Summary</option>
                         <option value="sites">By site</option>
+
                       </select>
                     </td>
                     <td>
@@ -127,6 +262,28 @@
     var fromDate = null;
     var toDate = null;
     $(document).ready(function() {
+      api.call("listMethods", function(res) {
+        var slist = _.sortBy(res.records,"name");
+        $.each(slist, function() {
+          $("<option value='" + this.id + "'>" + this.name + "</option>").appendTo($("#selectMethods"));
+        });
+        $('#selectMethods').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true,
+            onChange: function(option, checked, select) {
+               setSession();
+           },
+           onSelectAll: function() {
+               setSession();
+          },
+          onDeselectAll: function() {
+             setSession();
+           }
+        });
+      }, {}, {});
+
+    $('#selectMethods').multiselect('selectAll', false);
+    $('#selectMethods').multiselect('updateButtonText');
       api.call("listSites", function(res) {
         var slist = _.sortBy(res.records,"site");
         $.each(slist, function() {
@@ -178,6 +335,7 @@
 
       $('#selectSites').multiselect('selectAll', false);
       $('#selectSites').multiselect('updateButtonText');
+
       setTimeout(function() {
         setSession();
       }, 1500);
@@ -191,6 +349,7 @@
           dateto: toDate,
           datefrom: fromDate,
           sites: $("#selectSites").val(),
+          meth: $("#selectMethods").val(),
           grouping: $("#grouping").val(),
           timeline: $("#timeline").val()
         },

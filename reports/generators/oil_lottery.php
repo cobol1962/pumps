@@ -5,24 +5,20 @@ foreach ($_SESSION["reports"] as $k => $v) {
   $$k = $v;
 }
 $table = [];
-/*$sql = "select group_concat(distinct id) as ids from payments order by id";
-$r = $mysqli->query($sql);
-$methods = explode(",", mysqli_fetch_assoc($r)["ids"]);*/
-$methods = $meth;
 
+$methods = $meth;
 sort($methods);
 $mnames = [];
-foreach ($methods as $m) {
-  $sql = "select name from payment_methods where id=$m";
-  $mnames[$m] = mysqli_fetch_assoc($mysqli->query($sql))["name"];
-}
+$mnames["1"] = "Oil";
+$mnames["2"] = "Lottery";
+
 foreach ($sites as $s) {
   $sql = "select id,site from users where id=$s";
   $snames[$s] = mysqli_fetch_assoc($mysqli->query($sql))["site"];
 }
 
 $sit = implode(",", $sites);
-$sql = "select distinct siteid from payments where siteid IN($sit) order by id";
+$sql = "select distinct siteid from `sales_oil_lottery` where siteid IN($sit) and submitted=1 order by oilid";
 $r = $mysqli->query($sql);
 if ($timeline == "sum") {
   if ($grouping == "sites") {
@@ -30,14 +26,19 @@ if ($timeline == "sum") {
         $table[$row["siteid"]] = $row["id"];
         $site = $row["siteid"];
         foreach ($methods as $m) {
-          $sum = "select IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+          $sum = "select IFNULL(sum(value),0) as s, type from `sales_oil_lottery`
+          left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+          where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto')";
           $rsum = $mysqli->query($sum);
           $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
         }
       }
   } else {
     foreach ($methods as $m) {
-      $sum = "select IFNULL(sum(value),0) as s from payments where siteid IN ($sit) AND id=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+      $sum = "select  IFNULL(sum(value),0) as s, type from `sales_oil_lottery`
+      left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+       where submitted=1 and siteid IN ($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+
       $rsum = $mysqli->query($sum);
       $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
     }
@@ -49,13 +50,19 @@ if ($timeline != "sum") {
         $site =$row["siteid"];
         foreach ($methods as $m) {
           if ($timeline == "day") {
-            $sum = "select date,siteid,IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
+            $sum = "select date,siteid,IFNULL(sum(value),0) as s,type
+             from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+             where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
           }
           if ($timeline == "week") {
-            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
+            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(value),0) as s,sqlite_fetch_column_types
+             from `sales_oil_lottery` from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+             where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
           }
           if ($timeline == "month") {
-            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(value),0) as s from payments where siteid=$site and id=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
+            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(value),0) as s,sqlite_fetch_column_types
+            from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+            where submitted=1 and  siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
           }
           $rsum = $mysqli->query($sum);
           if (mysqli_num_rows($rsum) == 0) {
@@ -71,14 +78,18 @@ if ($timeline != "sum") {
   } else {
     foreach ($methods as $m) {
       if ($timeline == "day") {
-        $sum = "select date,IFNULL(sum(value),0) as s from payments where siteid in($sit) AND id=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
+        $sum = "select date,IFNULL(sum(value),0) as s,type
+        from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+         where submitted=1 and siteid in($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
       }
 
       if ($timeline == "week") {
-        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(value),0) as s from payments where siteid in($sit) AND id=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
+        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(value),0) as s from `sales_oil_lottery` where submitted=1 and  siteid in($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
       }
       if ($timeline == "month") {
-        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(value),0) as s from payments where siteid in($sit) AND  id=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
+        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(value),0) as s,type
+        from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+        where submitted=1 and siteid in($sit) AND  type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
       }
       $rsum = $mysqli->query($sum);
       while ($row = mysqli_fetch_assoc($rsum)) {
@@ -186,12 +197,10 @@ $dt = json_encode($table);
                 <th>Site</th>
               <? } ?>
               <?php
-                foreach ($methods as $m) {
-                  $sql = "select name from payment_methods where id=$m";
-                  $r = $mysqli->query($sql);
-                  echo "<th>" . mysqli_fetch_assoc($r)["name"] . "</th>";
-                }
-                echo "<th>Total</th>";
+                  foreach($methods as $m) {
+                    echo "<th>" . $mnames[$m] . "</th>";
+                  }
+                  echo "<th>Total</th>";
                ?>
             </tr>
         </thead>
@@ -285,7 +294,7 @@ $dt = json_encode($table);
                     <th>Total</th>
                     <?php
                       foreach ($methods as $m) {
-                        $sql = "select name from payment_methods where id=$m";
+                        $sql = "select grade from fuel where id=$m";
                         $r = $mysqli->query($sql);
                         echo "<th style='padding-right:7px;font-wight:bold;'>0.00</th>";
                       }
@@ -296,6 +305,7 @@ $dt = json_encode($table);
               <?php } ?>
               <?php
             if ($timeline != "sum" && $grouping == "sum") {
+
                 setlocale(LC_MONETARY, 'en_GB');
                     foreach($table as $k =>$v) {
                       echo "<tr><td>" . $k . "</td>";
@@ -318,7 +328,7 @@ $dt = json_encode($table);
                     <th>Total</th>
                     <?php
                       foreach ($methods as $m) {
-                        $sql = "select name from payment_methods where id=$m";
+                        $sql = "select grade from fuel where id=$m";
                         $r = $mysqli->query($sql);
                         echo "<th style='padding-right:7px;font-wight:bold;'>0.00</th>";
                       }
@@ -337,7 +347,6 @@ $dt = json_encode($table);
   </body>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-
   var data = <?php echo json_encode($table) ?>;
   var methods = <?php echo json_encode($mnames) ?>;
   var mth = <?php echo json_encode($methods) ?>;
@@ -397,10 +406,11 @@ $dt = json_encode($table);
     for (var prop in sData) {
       graphData[sites[prop]] =  gData[prop];
     }
-
     $("<option sum value='ColumnChart'>Column Chart(Sum)</option>").appendTo($("#chartType"));
+    $("<option sum value='ColumnChart'>Stacked Column Chart</option>").appendTo($("#chartType"));
     $("<option value='ColumnChart'>Column Chart</option>").appendTo($("#chartType"));
     $("<option value='BarChart'>Bar Chart</option>").appendTo($("#chartType"));
+    $("<option value='BarChart'>Stacked Bar Chart</option>").appendTo($("#chartType"));
     $("<option value='BarChart'>Bar Chart(Sum)</option>").appendTo($("#chartType"));
     $("#chartType").unbind("change");
     $("#chartType").bind("change", function() {
@@ -415,6 +425,7 @@ $dt = json_encode($table);
       }
     }, 100);
   }
+
 
   if (g == "sum" && t != "sum") {
 
@@ -480,7 +491,6 @@ $dt = json_encode($table);
           "sorting": false,
           dom: 'Bfrtip',
            buttons: [
-
              'colvis',
               { extend: 'print', footer: true, exportOptions: {
                     columns: ':visible'
@@ -516,7 +526,7 @@ $dt = json_encode($table);
                     columns: ':visible'
               },
               title: "Title",
-              download: "open",
+                download: "open",
               customize: function ( doc ) {
                 doc.content[0].text =  $("#rTitle").val();
                   if ($("#printOption").val() == "all" || $("#printOption").val() == "chart") {
@@ -529,8 +539,7 @@ $dt = json_encode($table);
                     if ($("#printOption").val() != "all" && $("#printOption").val() != "table") {
                         doc.content[1] = "";
                     }
-
-              }
+                  }
 
             },
            ],
@@ -585,7 +594,7 @@ $dt = json_encode($table);
       }
 
       data.addRows( dt );
-      var options = {'title':'Payments by methods',
+      var options = {'title':'Sales by type ',
                       'width': 750,
                       'height': 500};
 
@@ -646,7 +655,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Payments by sites',
+      var options = {'title':'Sales by sites',
                       'width': 750,
                       'height': 500};
 
@@ -708,7 +717,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Payments by period',
+      var options = {'title':'Oil & lottery sale by period',
                       'width': 750,
                       'height': 500};
 
@@ -797,7 +806,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Payments by period',
+      var options = {'title':'Oil & Lottery sale by period',
                       'width': 750,
                       'height': 500};
 
