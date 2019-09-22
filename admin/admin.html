@@ -287,7 +287,7 @@
                  </div>
              </div>
          </section>
-      
+
          <section page class="wrapper" id="services" style="display:none;padding: 20px;">
 
            <div style="margin:20px auto;width:220px;">
@@ -1941,6 +1941,7 @@
     function switchSite(el) {
       var usr = $.parseJSON(localStorage.user);
       usr.siteid = el.value;
+      usr.site = $(el).find("option:selected").text();
       localStorage.user = JSON.stringify(usr);
       window.location.href = "/user/user.html";
     }

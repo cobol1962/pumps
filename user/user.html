@@ -180,7 +180,6 @@
             <div class="top-menu">
             	<ul class="nav pull-right top-menu">
                   <li id="backtoadmin" style="display:none;"><a class="logout" style="background:white;color:black;" href="/admin/admin.html">Back to Admin</a></li>
-                  <li><a class="logout" style="background:white;color:black;" onclick="window.location.href = '/reports';">Reports</a></li>
                 <li><a class="logout" onclick="delete localStorage.user;window.location.href = '/user/index.html';">Logout</a></li>
             	</ul>
             </div>
@@ -266,7 +265,7 @@
               <table><tr><td>
               <label for="salesDate">Select date</label>
               <input type="text" class="form-control" id="salesDate" style="width:200px;">
-            </td><td><button onclick="sendFuel();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
+            </td></tr></table>
             </div>
             <h2 totalsales>Total fuel sales: &#163;0.00</h2>
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="saleSheet">
@@ -280,7 +279,7 @@
             <table><tr><td>
               <label for="oilSalesDate">Select date</label>
               <input type="text" class="form-control" id="oilSalesDate" style="width:200px;">
-            </td><td><button onclick="sendOil();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
+            </td></tr></table>
           </div>
             <h2 totaloilsales>Total oil & lottery sales: &#163;0.00</h2>
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;"  class='oil' id="oilSaleSheet">
@@ -312,7 +311,7 @@
               <table><tr><td>
                 <label for="servicesSalesDate">Select date</label>
                 <input type="text" class="form-control" id="serviceSalesDate" style="width:200px;">
-              </td><td><button onclick="sendServices();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
+              </td></tr></table>
 
             </div>
             <h2 totalservicesales>Total services sales: &#163;0.00</h2>
@@ -346,8 +345,11 @@
          </section>
          <section page class="wrapper" id="payments" style="display:none;padding: 20px;">
             <div style="margin:20px auto;width:220px;">
-              <label for="paymentDate">Select date</label>
-              <input type="text" class="form-control" id="paymentDate" style="width:200px;">
+              <table><tr><td>
+                <label for="paymentDate">Select date</label>
+                <input type="text" class="form-control" id="paymentDate" style="width:200px;">
+              </td></tr></table>
+
             </div>
 
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="paymentSheet">
@@ -365,12 +367,15 @@
 
                   </tbody>
               </table>
+              <table style="width:100%;"><tr><td style="text-align:center;"><button id="sTa" onclick="sendToAdmin();" class="btn btn-primary btn-large" style="margin-left:5px;margin-top:22px;">Submit to Admin</button></td></tr></table>
             </div>
          </section>
          <section page class="wrapper" id="products" style="display:none;padding: 20px;">
             <div style="margin:20px auto;width:220px;">
-              <label for="productSalesDate">Select date</label>
+              <table><tr><td>
+              <label for="productSaleDate">Select date</label>
               <input type="text" class="form-control" id="productSaleDate" style="width:200px;">
+              </td></tr></table>
             </div>
             <div style="width:100%;max-width:100%;display: inline-block;margin-top:10px;margin-left: -5px;" id="productSaleSheet">
               <div class="row">
@@ -465,6 +470,7 @@
     var fuelDeliveryDateNow = null;
     var siteConfiguration = null;
     var paymentDate = null;
+    var dow = null;
     var siteOil = {};
     url =  "http://samygroups.co.uk/admin/";
     var validator = null;
@@ -478,7 +484,7 @@
         var wdt = new Date(yesterday);
         var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
 
-        if (sDate && (new Date()).getHours() < 12) {
+        if (sDate && (new Date()).getHours() < 12 && isSubmitted == 0) {
           dEnabled = true;
         }
 
@@ -582,11 +588,11 @@
         $tb.find("[totalrow]").find("td").eq(5).html(fmt);
         $tb.find("[totalrow]").find("td").eq(5).attr("ttl", t);
         var gt = 0;
-        $.each($("[ttl]"), function() {
-          gt += parseFloat($(this).attr("ttl"));
+        $.each($tb.find("[total]"), function() {
+          gt += parseFloat($(this).attr("total"));
         });
         var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(gt);
-      //  $("[totalservicesales]").html("Total services sales: " + fmt);
+        $("[totalservicesales]").html("Total services sales: " + fmt);
       }
       function calculateSale(el) {
         var $el = $(el);
@@ -638,7 +644,7 @@
       var wdt = new Date(yesterday);
       var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
 
-      if (sDate && (new Date()).getHours() < 12) {
+      if (sDate && (new Date()).getHours() < 12 && isSubmitted == 0) {
         dEnabled = true;
       }
 
@@ -743,8 +749,19 @@
     var oils = null;
     var tanks = null;
     var pMethods = [];
-    $(document).ready(function() {
+    var isSubmitted = false;
 
+    $(document).ready(function() {
+    var cci = setInterval(function() {
+      var cdt = new Date(oilSaleDate);
+      var wdt = new Date(yesterday);
+      var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
+      if ((sDate && (new Date()).getHours() >= 12 || isSubmitted == 1) && user.user_type == "0") {
+        clearInterval(cci);
+        $("#sTa").hide();
+        $("input").prop("disabled", true);
+      }
+    }, 60000);
     if (localStorage.user === undefined) {
       window.location.href = "/user/index.html"
     }
@@ -820,6 +837,7 @@
       $("a.logo").html(user.site);
       $('#salesDate').datepicker({
         maxDate: (user.user_type == "1") ? "+0D" : "-1D",
+        minDate: (user.user_type == "1") ? "-365D" : "-1D",
         onSelect: function(dateText) {
           var dt = $('#salesDate').datepicker('getDate');
           dt.setHours((new Date()).getHours());
@@ -841,6 +859,7 @@
 
       $('#serviceSalesDate').datepicker({
         maxDate: (user.user_type == "1") ? "+0D" : "-1D",
+          minDate: (user.user_type == "1") ? "-365D" : "-1D",
         onSelect: function(dateText) {
           var dt = $('#serviceSalesDate').datepicker('getDate');
           dt.setHours(new Date().getHours());
@@ -861,6 +880,7 @@
 
       $('#fuelDeliveryDate').datepicker({
         maxDate: (user.user_type == "1") ? "+0D" : "-1D",
+          minDate: (user.user_type == "1") ? "-365D" : "-1D",
         onSelect: function(dateText) {
           var dt = $('#fuelDeliveryDate').datepicker('getDate');
           dt.setHours(new Date().getHours());
@@ -875,6 +895,7 @@
 
       $('#paymentDate').datepicker({
         maxDate: (user.user_type == "1") ? "+0D" : "-1D",
+          minDate: (user.user_type == "1") ? "-365D" : "-1D",
         onSelect: function(dateText) {
           var dt = $('#paymentDate').datepicker('getDate');
           dt.setHours(new Date().getHours());
@@ -889,6 +910,7 @@
       });
       $('#oilSalesDate').datepicker({
         maxDate: (user.user_type == "1") ? "+0D" : "-1D",
+          minDate: (user.user_type == "1") ? "-365D" : "-1D",
         onSelect: function(dateText) {
           var dt = $('#oilSalesDate').datepicker('getDate');
           dt.setHours(new Date().getHours());
@@ -899,6 +921,7 @@
 
       $('#productSaleDate').datepicker({
         maxDate: (user.user_type == "1") ? "+0D" : "-1D",
+        minDate: (user.user_type == "1") ? "-365D" : "-1D",
         onSelect: function(dateText) {
           var dt = $('#productSaleDate').datepicker('getDate');
           dt.setHours(new Date().getHours());
@@ -906,13 +929,22 @@
           setProductSales();
         }
       });
-
       $('#productSaleDate').datepicker('setDate', 'yesterday');
+      var dt = $('#productSaleDate').datepicker('getDate');;
+      dow = dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0");
       var dt = $('#productSaleDate').datepicker('getDate');
       dt.setHours(new Date().getHours());
       productSaleDate = dt.getFullYear() + "-" + (dt.getMonth() + 1).toString().padStart(2, "0") + "-" + dt.getDate().toString().padStart(2, "0");
       setProductSales();
-
+      api.call("isSubmitted", function(res) {
+        isSubmitted = res.submitted;
+        if (isSubmitted == "1" && user.user_type == "0") {
+          $("#sTa").hide();
+        }
+      }, {
+        date: dow,
+        siteid: user.siteid
+      }, {})
       $('#fuelDeliveryDate').datepicker('setDate', 'yesterday');
       var dt = $('#fuelDeliveryDate').datepicker('getDate');
       dt.setHours(new Date().getHours());
@@ -1053,7 +1085,7 @@
       var wdt = new Date(yesterday);
       var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
 
-      if (sDate && (new Date()).getHours() < 12) {
+      if (sDate && (new Date()).getHours() < 12 && isSubmitted == 0) {
         dEnabled = true;
       }
 
@@ -1236,6 +1268,7 @@
       $tr.find("td").eq(5).html(fmt);
       $tr.find("td").eq(5).attr("total", value);
       $tr.find("td").eq(2).html(sold);
+
       tableServicesTotal($el.closest("table"));
 
       var obj = {
@@ -1256,14 +1289,14 @@
     var productsTable = null;
     var pSales = {};
     function setProductSales() {
-      var dt = $('#productSaleDate').datepicker('getDate');
+      var dt = $('#oilSalesDate').datepicker('getDate');
       var dEnabled = false;
-      var cdt = new Date(productSaleDate);
+      var cdt = new Date(oilSalesDate);
       var wdt = new Date(yesterday);
 
       var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
 
-      if (sDate && (new Date()).getHours() < 12) {
+      if (sDate && (new Date()).getHours() < 12 && isSubmitted == 0) {
         dEnabled = true;
       }
 
@@ -1356,6 +1389,13 @@
     }
     function insertUpdateProductSales(tr) {
       var $tr = $(tr);
+      if ($tr.find("input").val() == "" || parseFloat($tr.find("input").val()) < 0) {
+        swal({
+          type: "error",
+          text: "Negative value not allowed"
+        })
+        return;
+      }
       var obj = {
         date: productSaleDate,
         siteid: user.siteid,
@@ -1385,7 +1425,7 @@
       var wdt = new Date(yesterday);
 
       var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
-      if (sDate && (new Date()).getHours() < 12) {
+      if (sDate && (new Date()).getHours() < 12 && isSubmitted == 0) {
         dEnabled = true;
       }
 
@@ -1440,6 +1480,13 @@
   }
   function updateFuelDelivery(el) {
     var tr = el.parentNode.parentNode;
+    if (el.value == "" || parseFloat(el.value) < 0) {
+      swal({
+        type: "error",
+        text: "Negative value not allowed"
+      })
+      return;
+    }
     var obj = {
       date: fuelDeliveryDate,
       siteid: user.siteid,
@@ -1459,7 +1506,7 @@
 
     var sDate = cdt.getFullYear() == wdt.getFullYear() && cdt.getMonth() == wdt.getMonth() && cdt.getDate() == wdt.getDate();
 
-    if (sDate && (new Date()).getHours() < 12) {
+    if (sDate && (new Date()).getHours() < 12 && isSubmitted == 0) {
       dEnabled = true;
     }
 
@@ -1469,7 +1516,7 @@
           var $tr = $("<tr paymentid='" + this.id + "'></tr>");
           $("<td paymentid='" + this.id + "'>" + this.id + "</td>").appendTo($tr);
           $("<td paymentid='" + this.id + "'>" + this.name + "</td>").appendTo($tr);
-          $("<td paymentid='" + this.id + "'><input onchange='updatePayment(this);' class='form-control' style='width:100px;' value='0' type='text' /></td>").appendTo($tr);
+          $("<td paymentid='" + this.id + "'><input onchange='updatePayment(this);' class='form-control' style='width:100px;' value='' type='text' /></td>").appendTo($tr);
           $tr.appendTo($bdy);
         });
         pTable = $("#paymentTable").DataTable({
@@ -1505,13 +1552,20 @@
           var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(fls[fid].value));
           this.node().getElementsByTagName("INPUT")[0].value = fmt;
         } else {
-          this.node().getElementsByTagName("INPUT")[0].value = "0";
+          this.node().getElementsByTagName("INPUT")[0].value = "";
         }
       });
     }, obj, {})
   }
   function updatePayment(el) {
     var tr = el.parentNode.parentNode;
+    if (el.value == "" || parseFloat(el.value) < 0) {
+      swal({
+        type: "error",
+        text: "Negative value not allowed"
+      })
+      return;
+    }
     var obj = {
       date: paymentDate,
       siteid: user.siteid,
@@ -1522,7 +1576,7 @@
 
     }, obj, {})
   }
-  function sendFuel() {
+  function sendToAdmin() {
     var valid = true;
     $.each($("[fuelenter]"), function() {
       $(this).removeClass("error");
@@ -1531,88 +1585,13 @@
         $(this).addClass("error");
       }
     });
-    if (!valid) {
+    if (!valid && user.user_type == "0") {
       swal({
         type: "error",
-        text: "Please enter all sales!"
+        text: "Please enter all fuel sales!"
       })
       return;
     }
-    api.call("submitFuelFales", function(res) {
-
-    },{
-      date:saleDate,
-      siteid: user.siteid
-    }, {})
-    var docDefinition = {
-        content: [
-          {text: user.site + ": Fuel sales for " + saleDate, fontSize: 17 },
-          {text: "Generated " + (new Date()), fontSize: 10 },
-          { text: $("[totalsales]").html(), fontWeight: "bold", margin: [ 0, 5, 10, 0 ]}
-        ]
-    };
-    $.each($("[pump]"), function() {
-      docDefinition.content.push(
-          { text: $(this).find("h4").html(), fontWeight: "bold", margin: [ 0, 10, 10, 0 ]}
-      )
-      var tb = [];
-      $.each($(this).find("thead").find("tr"), function() {
-        var r = [];
-        $.each($(this).find("th"), function() {
-            r.push($(this).html());
-        });
-          tb.push(r);
-      });
-
-      $.each($(this).find("tbody").find("tr"), function() {
-        var r = [];
-        $.each($(this).find("td"), function() {
-          if ($(this).find("input").length == 0) {
-            r.push($(this).html());
-          } else {
-            r.push($(this).find("input").val());
-          }
-        })
-        tb.push(r);
-      });
-
-      docDefinition.content.push(
-        {
-            layout: 'lightHorizontalLines', // optional
-            table: {
-              // headers are automatically repeated if the table spans over multiple pages
-              // you can declare how many rows should be treated as headers
-              headerRows: 1,
-               widths: [ '*', '*', '*', '*', '*', '*' ],
-              body: tb
-            }
-        }
-      )
-    });
-    var pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.getBase64((data) => {
-        $.ajax({
-          url: "mailToAdmin.php",
-          type: "POST",
-          data: {
-            from: user.email,
-            pdf: data,
-            name: "Fuel_sales_" + (new Date()).getTime() + ".pdf",
-            subject: user.site + " Fuel sales " + saleDate,
-            text: "Generated " + (new Date())
-          },
-           success: function() {
-             swal({
-               type: "success",
-               text: "mail sent succesfully"
-             })
-          }
-
-        })
-    });
-  }
-  function sendOil() {
-    var valid = true;
     $.each($("[oilend]"), function() {
       var tr = $(this).closest("tr");
       $(this).removeClass("error");
@@ -1623,67 +1602,121 @@
         $(this).removeClass("error");
       }
     });
-    if (!valid) {
+    if (!valid && user.user_type == "0") {
       swal({
         type: "error",
-        text: "Please enter all sales!"
+        text: "Please enter all oil & lottery sales!"
       })
       return;
     }
-    api.call("submitOilSales", function(res) {
 
-    },{
-      date: oilSaleDate,
-      siteid: user.siteid
-    }, {})
+    $.each($("#serviceSales").find("input"), function() {
+      var tr = $(this).closest("tr");
+      $(this).removeClass("error");
+      if (this.value == "") {
+        $(this).addClass("error");
+        valid = false;
+      } else {
+        $(this).removeClass("error");
+      }
+    });
+    if (!valid && user.user_type == "0") {
+      swal({
+        type: "error",
+        text: "Please enter all services sales!"
+      })
+      return;
+    }
+    productsTable.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+      var tr = this.node();
+      if ( tr.getElementsByTagName("INPUT")[0].value == "") {
+        valid = false;
+        $(tr.getElementsByTagName("INPUT")[0]).addClass("error");
+      } else {
+        $(tr.getElementsByTagName("INPUT")[0]).removeClass("error");
+      }
+
+    });
+    if (!valid && user.user_type == "0") {
+      swal({
+        type: "error",
+        text: "Please enter all products sales!"
+      })
+      return;
+    }
+
+    $.each($("#paymentTable").find("input"), function() {
+      var tr = $(this).closest("tr");
+      $(this).removeClass("error");
+      if (this.value == "") {
+        $(this).addClass("error");
+        valid = false;
+      } else {
+        $(this).removeClass("error");
+      }
+    });
+    if (!valid && user.user_type == "0") {
+      swal({
+        type: "error",
+        text: "Please enter all payments!"
+      })
+      return;
+    }
+    var sb = true;
+    swal({
+      type: "warning",
+      text: "After subbmitting report you will not be able to change data!",
+      showCancelButton: true
+    }).then((result) => {
+      if (result.value) {
+        api.call("submitSales", function(res) {
+          submitPDF();
+        },{
+          date: dow,
+          siteid: user.siteid
+        }, {})
+      }
+    })
+
+  }
+function submitPDF() {
+  api.call("getDailyReport", function(res) {
     var docDefinition = {
-      pageOrientation: 'landscape',
         content: [
-          {text: user.site + ": Oil & Lottery sales for " + oilSaleDate, fontSize: 17 },
-          {text: "Generated " + (new Date()), fontSize: 10 },
-          { text: $("[totaloilsales]").html(), fontWeight: "bold", margin: [ 0, 5, 10, 0 ]}
+          {text: user.site + ": Report for " + dow, fontSize: 17 },
+          {text: "Generated " + (new Date()) + " " + ((user.user_type == "1") ? "(Generated by admin)" : ""), fontSize: 10 }
         ]
     };
+    var tb = [];
+    var r = [];
+    r.push(
+      {text: "Type", alignment: "left"});
+    r.push(
+      {text: "Amount", alignment: "left"});
 
-      var tb = [];
-      $.each($("#oilSalesTable").find("thead").find("tr"), function() {
-        var r = [];
-        $.each($(this).find("th"), function() {
-            r.push($(this).html());
-        });
-        tb.push(r);
-      });
+    tb.push(r);
 
-      tOilSales.rows().eq(0).each( function ( index ) {
-        var row = tOilSales.row( index );
-        var r = [];
-        var node = row.node();
-        if ($(node).find("[oilstart]").val() > 0 || $(node).find("[oilend]").val() > 0 || $(node).find("[total]").attr("value") != "0") {
-            $.each($(node).find("td"), function() {
-              if ($(this).find("input").length == 0) {
-                r.push($(this).html());
-              } else {
-                r.push($(this).find("input").val());
-              }
-            });
-            tb.push(r);
-          }
-      } );
-
-      docDefinition.content.push(
-        {
-            layout: 'lightHorizontalLines', // optional
-            table: {
-              // headers are automatically repeated if the table spans over multiple pages
-              // you can declare how many rows should be treated as headers
-              headerRows: 1,
-               widths: [ '*', '*', '*', '*', '*', '*', '*', '*', '*' ],
-              body: tb
-            }
-        }
-      )
-
+    for (var k in res) {
+      var r = [];
+      r.push(k);
+      var fmt = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(parseFloat(res[k]));
+      r.push(
+        {text:fmt, alignment: "right"});
+      tb.push(r);
+    }
+    docDefinition.content.push(
+       {
+           layout: 'lightHorizontalLines', // optional
+           table: {
+             // headers are automatically repeated if the table spans over multiple pages
+             // you can declare how many rows should be treated as headers
+             headerRows: 1,
+             body: tb
+           }
+       }
+     )
     var pdfDocGenerator = pdfMake.createPdf(docDefinition);
+
     pdfDocGenerator.getBase64((data) => {
         $.ajax({
           url: "mailToAdmin.php",
@@ -1691,11 +1724,15 @@
           data: {
             from: user.email,
             pdf: data,
-            name: "Oil_Lottery_sales_" + (new Date()).getTime() + ".pdf",
-            subject: user.site + " Oil & Lottery sales " + saleDate,
-            text: "Generated " + (new Date())
+            name: "sales_" + (new Date()).getTime() + ".pdf",
+            subject: user.site + " Report " + dow + " " + ((user.user_type == "1") ? "Generated by admin" : ""),
+            text: "Generated " + (new Date()),
+            user: user.email
           },
            success: function() {
+             if (user.user_type == "0") {
+               window.location.reload();
+              }
              swal({
                type: "success",
                text: "mail sent succesfully"
@@ -1704,7 +1741,12 @@
 
         })
     });
-  }
+  }, {
+    date: dow,
+    siteid: user.siteid
+  }, {});
+
+}
   </script>
 
   </body>

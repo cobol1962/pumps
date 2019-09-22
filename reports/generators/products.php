@@ -5,40 +5,44 @@ foreach ($_SESSION["reports"] as $k => $v) {
   $$k = $v;
 }
 $table = [];
-
+/*$sql = "select group_concat(distinct id) as ids from payments order by id";
+$r = $mysqli->query($sql);
+$methods = explode(",", mysqli_fetch_assoc($r)["ids"]);*/
 $methods = $meth;
 sort($methods);
 $mnames = [];
-$mnames["1"] = "Oil";
-$mnames["2"] = "Lottery";
-
+foreach ($methods as $m) {
+  $sql = "select name from `product_categories` where id=$m";
+  $mnames[$m] = mysqli_fetch_assoc($mysqli->query($sql))["name"];
+}
 foreach ($sites as $s) {
   $sql = "select id,site from users where id=$s";
   $snames[$s] = mysqli_fetch_assoc($mysqli->query($sql))["site"];
 }
 
 $sit = implode(",", $sites);
-$sql = "select distinct siteid from `sales_oil_lottery` where siteid IN($sit) and submitted=1 order by oilid";
-$r = $mysqli->query($sql);
+$sql = "select distinct siteid from `products_sales` where siteid IN($sit) and submitted=1 order by productid";
+ $r = $mysqli->query($sql);
 if ($timeline == "sum") {
   if ($grouping == "sites") {
       while ($row = mysqli_fetch_assoc($r)) {
         $table[$row["siteid"]] = $row["id"];
         $site = $row["siteid"];
         foreach ($methods as $m) {
-          $sum = "select IFNULL(sum(value),0) as s, type from `sales_oil_lottery`
-          left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-          where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+          $sum = "select IFNULL(sum(products_sales.sales),0) as s, category from products_sales
+            left join products on products.id=products_sales.productid
+            where
+           submitted=1 and siteid=$site and category=$m AND (date >= '$datefrom' AND date <= '$dateto')";
           $rsum = $mysqli->query($sum);
           $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
         }
       }
   } else {
     foreach ($methods as $m) {
-      $sum = "select  IFNULL(sum(value),0) as s, type from `sales_oil_lottery`
-      left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-       where submitted=1 and siteid IN ($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto')";
-
+      $sum = "select IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+      left join products on products.id=products_sales.productid
+      where
+     submitted=1 and siteid IN ($sit) AND category=$m AND (date >= '$datefrom' AND date <= '$dateto')";
       $rsum = $mysqli->query($sum);
       $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
     }
@@ -50,19 +54,19 @@ if ($timeline != "sum") {
         $site =$row["siteid"];
         foreach ($methods as $m) {
           if ($timeline == "day") {
-            $sum = "select date,siteid,IFNULL(sum(value),0) as s,type
-             from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-             where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
+            $sum = "select date,siteid,IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+            left join products on products.id=products_sales.productid
+            where submitted=1 and siteid=$site and category=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
           }
           if ($timeline == "week") {
-            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(value),0) as s,type
-             from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-             where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
+            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+            left join products on products.id=products_sales.productid
+            where submitted=1 and siteid=$site and category=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
           }
           if ($timeline == "month") {
-            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(value),0) as s,type
-            from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-            where submitted=1 and  siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
+            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+            left join products on products.id=products_sales.productid
+             where submitted=1 and  siteid=$site and category=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
           }
           $rsum = $mysqli->query($sum);
           if (mysqli_num_rows($rsum) == 0) {
@@ -78,19 +82,20 @@ if ($timeline != "sum") {
   } else {
     foreach ($methods as $m) {
       if ($timeline == "day") {
-        $sum = "select date,IFNULL(sum(value),0) as s,type
-        from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-         where submitted=1 and siteid in($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
+        $sum = "select date,IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+        left join products on products.id=products_sales.productid
+        where submitted=1 and siteid in($sit) AND category=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
       }
 
       if ($timeline == "week") {
-        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(value),0) as s,type
-        from `sales_oil_lottery` where submitted=1 and  siteid in($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
+        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+        left join products on products.id=products_sales.productid
+        where submitted=1 and  siteid in($sit) AND category=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
       }
       if ($timeline == "month") {
-        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(value),0) as s,type
-        from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-        where submitted=1 and siteid in($sit) AND  type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
+        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(products_sales.sales),0) as s,category from products_sales
+        left join products on products.id=products_sales.productid
+        where submitted=1 and siteid in($sit) AND  category=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
       }
       $rsum = $mysqli->query($sum);
       while ($row = mysqli_fetch_assoc($rsum)) {
@@ -198,10 +203,12 @@ $dt = json_encode($table);
                 <th>Site</th>
               <? } ?>
               <?php
-                  foreach($methods as $m) {
-                    echo "<th>" . $mnames[$m] . "</th>";
-                  }
-                  echo "<th>Total</th>";
+                foreach ($methods as $m) {
+                  $sql = "select name from `product_categories` where id=$m";
+                  $r = $mysqli->query($sql);
+                  echo "<th>" . mysqli_fetch_assoc($r)["name"] . "</th>";
+                }
+                echo "<th>Total</th>";
                ?>
             </tr>
         </thead>
@@ -295,7 +302,7 @@ $dt = json_encode($table);
                     <th>Total</th>
                     <?php
                       foreach ($methods as $m) {
-                        $sql = "select grade from fuel where id=$m";
+                        $sql = "select name from product_categories where id=$m";
                         $r = $mysqli->query($sql);
                         echo "<th style='padding-right:7px;font-wight:bold;'>0.00</th>";
                       }
@@ -329,7 +336,7 @@ $dt = json_encode($table);
                     <th>Total</th>
                     <?php
                       foreach ($methods as $m) {
-                        $sql = "select grade from fuel where id=$m";
+                        $sql = "select grade from product_categories where id=$m";
                         $r = $mysqli->query($sql);
                         echo "<th style='padding-right:7px;font-wight:bold;'>0.00</th>";
                       }
@@ -488,6 +495,7 @@ $dt = json_encode($table);
     } );
     setTimeout(function() {
        rt = $("#reportTable").DataTable({
+         "download": "open",
           "paging": false,
           "sorting": false,
           dom: 'Bfrtip',
@@ -527,7 +535,8 @@ $dt = json_encode($table);
                     columns: ':visible'
               },
               title: "Title",
-                download: "open",
+              download: "open",
+              orientation: 'landscape',
               customize: function ( doc ) {
                 doc.content[0].text =  $("#rTitle").val();
                   if ($("#printOption").val() == "all" || $("#printOption").val() == "chart") {
@@ -595,7 +604,7 @@ $dt = json_encode($table);
       }
 
       data.addRows( dt );
-      var options = {'title':'Sales by type ',
+      var options = {'title':'Sales by product category',
                       'width': 750,
                       'height': 500};
 
@@ -718,7 +727,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Oil & lottery sale by period',
+      var options = {'title':'Products sale by period',
                       'width': 750,
                       'height': 500};
 
@@ -807,7 +816,7 @@ $dt = json_encode($table);
         }
       }
 
-      var options = {'title':'Oil & Lottery sale by period',
+      var options = {'title':'Product sale by period',
                       'width': 750,
                       'height': 500};
 

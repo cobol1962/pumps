@@ -1095,6 +1095,22 @@
     }
     return $res;
   }
+  function listProductCategories($post, $mysqli) {
+    $res = [];
+
+    $s_sql = "select *  from  `product_categories`  where parent_id<>''";
+    $s_res = $mysqli->query($s_sql);
+    if (!mysqli_query($mysqli,$s_sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      while ($row = mysqli_fetch_assoc($s_res)) {
+        $res["records"][] = $row;
+      }
+      $res["status"] = "ok";
+    }
+    return $res;
+  }
   function submitFuelFales($post, $mysqli) {
     $res = [];
     foreach ($post as $k => $v) {
@@ -1110,19 +1126,79 @@
     }
     return $res;
   }
-  function submitOilSales($post, $mysqli) {
+  function submitSales($post, $mysqli) {
     $res = [];
     foreach ($post as $k => $v) {
       $$k = $v;
     }
     $sql = "update `sales_oil_lottery` set submitted=1 where date='$date' and siteid='$siteid'";
-
+    $mysqli->query($sql);
+    $sql = "update fuel_sales set submitted=1 where date='$date' and siteid='$siteid'";
+    $mysqli->query($sql);
+    $sql = "update `products_sales` set submitted=1 where date='$date' and siteid='$siteid'";
+    $mysqli->query($sql);
+    $sql = "update `services_sales` set submitted=1 where date='$date' and siteid='$siteid'";
+    $mysqli->query($sql);
+    $sql = "update `payments` set submitted=1 where date='$date' and siteid='$siteid'";
+    $mysqli->query($sql);
+    $sql = "insert into sites_submitted (date,siteid) values('$date','$siteid')";
     if (!mysqli_query($mysqli,$sql)) {
       $res["status"] = "fail";
       $res["error"] = mysqli_error($mysqli);
     } else {
       $res["status"] = "ok";
     }
+    return $res;
+  }
+  function isSubmitted($post, $mysqli) {
+    $res = [];
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "select * from `sites_submitted` where date='$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["submitted"] = mysqli_num_rows($r);
+    if (!mysqli_query($mysqli,$sql)) {
+      $res["status"] = "fail";
+      $res["error"] = mysqli_error($mysqli);
+    } else {
+      $res["status"] = "ok";
+
+    }
+    return $res;
+  }
+  function getDailyReport($post, $mysqli) {
+    $res = [];
+    foreach ($post as $k => $v) {
+      $$k = $v;
+    }
+    $sql = "select IFNULL(sum(value),0) as s from fuel_sales where submitted=1 AND date = '$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["Fuel"] = mysqli_fetch_assoc($r)["s"];
+
+    $sql = "select IFNULL(sum(value),0) as s,type from `sales_oil_lottery`
+    left join oil_lottery on oil_lottery.oilid=`sales_oil_lottery`.oilid
+    where submitted=1 and type=1 AND date='$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["Oil"] = mysqli_fetch_assoc($r)["s"];
+
+    $sql = "select IFNULL(sum(value),0) as s,type from `sales_oil_lottery`
+    left join oil_lottery on oil_lottery.oilid=`sales_oil_lottery`.oilid
+    where submitted=1 and type=2 AND date='$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["Lottery"] = mysqli_fetch_assoc($r)["s"];
+
+    $sql = "select IFNULL(sum(value),0) as s from `services_sales` where submitted=1  AND date= '$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["Services"] = mysqli_fetch_assoc($r)["s"];
+
+    $sql = "select IFNULL(sum(sales),0) as s from `products_sales` where submitted=1  AND date= '$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["Products"] = mysqli_fetch_assoc($r)["s"];
+
+    $sql = "select IFNULL(sum(value), 0) as s from `payments` where submitted=1  AND date= '$date' and siteid='$siteid'";
+    $r = $mysqli->query($sql);
+    $res["Payments"] = mysqli_fetch_assoc($r)["s"];
     return $res;
   }
 ?>

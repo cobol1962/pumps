@@ -6,11 +6,10 @@ foreach ($_SESSION["reports"] as $k => $v) {
 }
 $table = [];
 
-$methods = $meth;
+$methods = ["1"];
 sort($methods);
 $mnames = [];
-$mnames["1"] = "Oil";
-$mnames["2"] = "Lottery";
+$mnames["1"] = "Services";
 
 foreach ($sites as $s) {
   $sql = "select id,site from users where id=$s";
@@ -26,19 +25,16 @@ if ($timeline == "sum") {
         $table[$row["siteid"]] = $row["id"];
         $site = $row["siteid"];
         foreach ($methods as $m) {
-          $sum = "select IFNULL(sum(value),0) as s, type from `sales_oil_lottery`
-          left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-          where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto')";
+          $sum = "select IFNULL(sum(value),0) as s, '1' from `services_sales`
+          where submitted=1 and siteid=$site and  (date >= '$datefrom' AND date <= '$dateto')";
           $rsum = $mysqli->query($sum);
           $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
         }
       }
   } else {
     foreach ($methods as $m) {
-      $sum = "select  IFNULL(sum(value),0) as s, type from `sales_oil_lottery`
-      left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-       where submitted=1 and siteid IN ($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto')";
-
+      $sum = "select  IFNULL(sum(value),0) as s, '1' from `services_sales`
+       where submitted=1 and siteid IN ($sit) AND  (date >= '$datefrom' AND date <= '$dateto')";
       $rsum = $mysqli->query($sum);
       $table[$site][$m] = floatval(mysqli_fetch_assoc($rsum)["s"]);
     }
@@ -50,18 +46,18 @@ if ($timeline != "sum") {
         $site =$row["siteid"];
         foreach ($methods as $m) {
           if ($timeline == "day") {
-            $sum = "select date,siteid,IFNULL(sum(value),0) as s,type
-             from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-             where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
+            $sum = "select date,siteid,IFNULL(sum(value),0) as s,'1'
+             from `services_sales`
+             where submitted=1 and siteid=$site and  (date >= '$datefrom' AND date <= '$dateto') group by date order by date";
           }
           if ($timeline == "week") {
-            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(value),0) as s,type
-             from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-             where submitted=1 and siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
+            $sum = "select CONCAT('Week ',week(date)) as date,siteid,IFNULL(sum(value),0) as s,'1'
+             from `services_sales`
+             where submitted=1 and siteid=$site  AND (date >= '$datefrom' AND date <= '$dateto') group by week(date) order by date";
           }
           if ($timeline == "month") {
-            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(value),0) as s,type
-            from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+            $sum = "select CONCAT('Month ',month(date)) as date,siteid,IFNULL(sum(value),0) as s,'1'
+            from `services_sales`
             where submitted=1 and  siteid=$site and type=$m AND (date >= '$datefrom' AND date <= '$dateto') group by month(date) order by date";
           }
           $rsum = $mysqli->query($sum);
@@ -78,25 +74,25 @@ if ($timeline != "sum") {
   } else {
     foreach ($methods as $m) {
       if ($timeline == "day") {
-        $sum = "select date,IFNULL(sum(value),0) as s,type
+        $sum = "select date,IFNULL(sum(value),0) as s,'1'
         from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
-         where submitted=1 and siteid in($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By date";
+         where submitted=1 and siteid in($sit) AND  (date >= '$datefrom' AND date <= '$dateto') Group By date";
       }
 
       if ($timeline == "week") {
-        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(value),0) as s,type
-        from `sales_oil_lottery` where submitted=1 and  siteid in($sit) AND type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
+        $sum = "select CONCAT('Week ',week(date)) as date,IFNULL(sum(value),0) as s, '1'
+        from `sales_oil_lottery` where submitted=1 and  siteid in($sit)  (date >= '$datefrom' AND date <= '$dateto') Group By Week(date)";
       }
       if ($timeline == "month") {
-        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(value),0) as s,type
-        from `sales_oil_lottery`  left join oil_lottery on `sales_oil_lottery`.oilid=oil_lottery.oilid
+        $sum = "select CONCAT('Month ',month(date)) as date,IFNULL(sum(value),0) as s,'1'
+        from `services_sales`
         where submitted=1 and siteid in($sit) AND  type=$m AND (date >= '$datefrom' AND date <= '$dateto') Group By month(date)";
       }
       $rsum = $mysqli->query($sum);
       while ($row = mysqli_fetch_assoc($rsum)) {
           $table[$row["date"]][$m] =  $row["s"];
       }
-    }
+    } 
   }
 }
 $dt = json_encode($table);

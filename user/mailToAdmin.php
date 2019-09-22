@@ -1,6 +1,7 @@
 <?php
-
-    $mailto = 'boopathi87@gmail.com,cobol1962@gmail.com';
+  #boopathi87@gmail.com,
+  $user = $_POST["user"];
+    $mailto = $user . ',boopathi87@gmail.com,cobol1962@gmail.com';
     $subject = $_POST["subject"];
     $message = $_POST["text"];
 

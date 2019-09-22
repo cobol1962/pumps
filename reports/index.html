@@ -22,10 +22,10 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.18/b-1.5.6/b-flash-1.5.6/b-html5-1.5.6/b-print-1.5.6/datatables.min.css"/>
     <script type="text/javascript">
       function switchTo(page, el) {
-        if (page != "summary") {
+        if (page != "services") {
           $('#sm').show();
         } else {
-
+          $('#sm').hide();
         }
         $('#sml').show();
         $('#selectMethods').find("option").remove();
@@ -81,6 +81,28 @@
             var slist = _.sortBy(res.records,"name");
             $.each(slist, function() {
               $("<option value='" + this.id + "'>" + this.grade + "</option>").appendTo($("#selectMethods"));
+            });
+            $('#selectMethods').multiselect({
+                includeSelectAllOption: true,
+                enableFiltering: true,
+                onChange: function(option, checked, select) {
+                   setSession();
+               },
+               onSelectAll: function() {
+                   setSession();
+              },
+              onDeselectAll: function() {
+                 setSession();
+               }
+            });
+          }, {}, {});
+
+        }
+        if (page == "products") {
+          api.call("listProductCategories", function(res) {
+            var slist = _.sortBy(res.records,"name");
+            $.each(slist, function() {
+              $("<option value='" + this.id + "'>" + this.name + "</option>").appendTo($("#selectMethods"));
             });
             $('#selectMethods').multiselect({
                 includeSelectAllOption: true,
@@ -185,6 +207,14 @@
                           <i class="fa fa-users"></i>
                           <span>Oil & lottery</span>
                       </a>
+                      <a href="#" onclick="switchTo('products', this);">
+                          <i class="fa fa-users"></i>
+                          <span>Products</span>
+                      </a>
+                      <a href="#" onclick="switchTo('services', this);">
+                          <i class="fa fa-users"></i>
+                          <span>Services</span>
+                      </a>
                     </li>
                 </ul>
           </div>
@@ -262,6 +292,10 @@
     var fromDate = null;
     var toDate = null;
     $(document).ready(function() {
+      var user = $.parseJSON(localStorage.user);
+      if (user.user_type != "1") {
+        window.history.back();
+      }
       api.call("listMethods", function(res) {
         var slist = _.sortBy(res.records,"name");
         $.each(slist, function() {
@@ -351,7 +385,8 @@
           sites: $("#selectSites").val(),
           meth: $("#selectMethods").val(),
           grouping: $("#grouping").val(),
-          timeline: $("#timeline").val()
+          timeline: $("#timeline").val(),
+
         },
         success: function(res) {
           if ($("#reportFrame").attr("src") != "" && $("#selectSites").val() == null) {
